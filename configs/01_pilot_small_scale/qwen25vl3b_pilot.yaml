@@ -1,0 +1,25 @@
+experiment:
+  name: qwen25vl3b_pilot
+  stage: pilot_small_scale
+  publish: false
+  description: "Early pilot experiments using small numbers of images, such as 5, 20, 40, and up to 649."
+
+model:
+  name: Qwen/Qwen2.5-VL-3B-Instruct
+  short_name: qwen25vl3b
+
+data:
+  image_dir: data/01_pilot_649/images
+  processed_dir: data/01_pilot_649/processed
+
+outputs:
+  root_dir: outputs/01_pilot_small_scale
+  vectors_dir: outputs/01_pilot_small_scale/vectors
+  root_csv_dir: outputs/01_pilot_small_scale/root_csv
+
+steering:
+  default_layer: 32
+  default_alpha: 0.5
+
+notes:
+  main_dir: notes/01_pilot_small_scale

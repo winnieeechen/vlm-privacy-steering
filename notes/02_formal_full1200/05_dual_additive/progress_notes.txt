@@ -1,0 +1,103 @@
+Dual-additive original-logic full1200 experiment
+
+Goal:
+Run true combined activation steering with both over and under vectors added in the same forward pass.
+
+This is different from dual-router cached combine.
+
+Previous dual-router:
+If over gate is true, use over-steered output.
+Else if under gate is true, use under-steered output.
+Else use base output.
+
+Dual-additive formula:
+h'_{l,t} = h_{l,t}
+          + g_privacy * alpha_over * v_privacy,l
+          + g_allowed * alpha_under * v_utility,l
+
+Where:
+g_privacy = 1 if over condition score >= over threshold, else 0
+g_allowed = 1 if under condition score >= under threshold, else 0
+
+Current thresholds selected from val:
+over threshold = -0.03
+under threshold = 0.04
+
+Current alpha/layer setting:
+layer = 32
+alpha_over = 0.5
+alpha_under = 0.5
+
+Vectors:
+over behavior vector:
+outputs/original_logic_full1200/vectors/behavior_vectors_full1200.pt
+
+under behavior vector:
+outputs/original_logic_full1200_under/vectors/under_behavior_vectors_full1200.pt
+
+Condition scores:
+val over scores:
+outputs/original_logic_full1200/condition_scores_val_layer32.csv
+
+val under scores:
+outputs/original_logic_full1200_under/under_condition_scores_val_layer32.csv
+
+test over scores:
+outputs/original_logic_full1200/condition_scores_test_layer32.csv
+
+test under scores:
+outputs/original_logic_full1200_under/under_condition_scores_test_layer32.csv
+
+Plan:
+1. Build a true dual-additive inference script.
+2. Run val first.
+3. Compare with base, over-only, under-only, and dual-router.
+4. If val is reasonable, run test.
+
+Dual-additive results, layer 32, alpha_over = 0.5, alpha_under = 0.5
+over threshold = -0.03
+under threshold = 0.04
+
+Val gate counts:
+over only = 117
+under only = 91
+both = 30
+
+Val base:
+Correct 83/238 = 0.349
+Over 40/238 = 0.168
+Under 115/238 = 0.483
+
+Val dual-additive:
+Correct 93/238 = 0.391
+Over 23/238 = 0.097
+Under 122/238 = 0.513
+
+Test gate counts:
+over only = 102
+under only = 109
+both = 32
+
+Test base:
+Correct 87/243 = 0.358
+Over 44/243 = 0.181
+Under 112/243 = 0.461
+
+Test dual-additive:
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Comparison with dual-router over_first on test:
+Dual-router over_first:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Dual-additive:
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Main conclusion:
+Dual-additive steering is the true implementation of the combined formula. It improves correctness more than dual-router and reduces under-disclosure compared with dual-router, at the cost of one additional over-disclosure case. This makes it a promising balanced variant.

@@ -1,0 +1,5 @@
+strategy,correct,over,under,action_base,action_over,action_under,output_csv
+over_first,94,22,122,0,147,91,/home/wc221/vlm-privacy-steering/outputs/original_logic_full1200_combined/val/combined_val_over_first_layer32_alpha0.5.csv
+under_first,92,27,119,0,117,121,/home/wc221/vlm-privacy-steering/outputs/original_logic_full1200_combined/val/combined_val_under_first_layer32_alpha0.5.csv
+conflict_base,91,27,120,30,117,91,/home/wc221/vlm-privacy-steering/outputs/original_logic_full1200_combined/val/combined_val_conflict_base_layer32_alpha0.5.csv
+conflict_score_margin,94,24,120,0,132,106,/home/wc221/vlm-privacy-steering/outputs/original_logic_full1200_combined/val/combined_val_conflict_score_margin_layer32_alpha0.5.csv

@@ -1,0 +1,23 @@
+name: vlmprivacy
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - scikit-learn
+  - tqdm
+  - pyyaml
+  - pillow
+  - pip:
+      - torchvision
+      - transformers
+      - accelerate
+      - sentencepiece
+      - protobuf
+      - datasets==3.6.0
+      - huggingface_hub
+      - qwen-vl-utils

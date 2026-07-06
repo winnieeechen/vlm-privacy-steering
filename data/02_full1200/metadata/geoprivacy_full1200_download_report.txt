@@ -1,0 +1,20 @@
+# GeoPrivacyBench full1200 preparation report
+
+Metadata source: /home/wc221/vlm-privacy-steering/external/VLM-GeoPrivacyBench/evaluation/temp0_safety/zs/responses/api_gen_zs_free-form_gpt-4.1-mini_temp0_safety_zs_combined1200_sample_20251117-111925.json
+Total rows: 1086
+Readable images: 0
+Missing/unreadable images: 1086
+
+Label counts: {'B': 423, 'A': 223, 'C': 440}
+Split counts: {'': 1086}
+Source counts: {'': 1086}
+
+Available label counts: {}
+Available split counts: {}
+
+Missing status counts: {'missing': 1086}
+Missing source counts: {'': 1086}
+
+Full CSV: /home/wc221/vlm-privacy-steering/data/full1200/geoprivacy_full1200.csv
+Available CSV: /home/wc221/vlm-privacy-steering/data/full1200/geoprivacy_full1200_available.csv
+Missing CSV: /home/wc221/vlm-privacy-steering/data/full1200/geoprivacy_full1200_missing.csv

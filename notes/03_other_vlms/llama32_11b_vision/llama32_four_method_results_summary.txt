@@ -1,0 +1,302 @@
+Llama-3.2-11B-Vision results summary
+Original-logic full1200 experiment
+
+This note summarizes the completed Llama-3.2-11B-Vision steering results:
+
+1. Over-only conditional steering
+2. Under-only safe conditional steering
+3. Dual-router combined steering
+
+Base model is included as reference.
+
+Dual-additive combined steering has not been run yet.
+In the cached combined router, the over gate and under gate never overlap on val or test, so dual-additive is not expected to show a meaningful simultaneous-vector interaction under the current thresholds.
+
+============================================================
+Method definitions
+============================================================
+
+Base:
+No activation steering.
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+
+Goal:
+Reduce over-disclosure.
+
+Condition vector:
+positive = true A/B
+negative = true C
+
+Behavior vector:
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+
+Formula:
+h' = h + g_privacy * alpha_over * v_privacy
+
+Gate:
+g_privacy = 1 if over condition score >= 0.04
+g_privacy = 0 otherwise
+
+Selected setting:
+behavior layer = 24
+condition layer = 32
+alpha_over = 1.0
+over threshold = 0.04
+
+Note:
+The over behavior vector is weak for Llama because the positive behavior cases contain no A_to_A examples.
+It mostly learns a movement away from C toward B, rather than a strong refusal / abstention direction for true-A cases.
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+
+Goal:
+Reduce under-disclosure while avoiding increased over-disclosure.
+
+Condition vector:
+positive = true B/C
+negative = true A
+
+Behavior vector:
+positive = B_to_B, C_to_C
+negative = B_to_A, C_to_A, C_to_B
+
+Formula:
+h' = h + g_allowed * alpha_under * v_utility
+
+Gate:
+g_allowed = 1 if under condition score >= 0.10
+g_allowed = 0 otherwise
+
+Selected setting:
+behavior layer = 32
+condition layer = 32
+alpha_under = 0.5
+under threshold = 0.10
+
+Note:
+The safe threshold is selected because it reduces under-disclosure without increasing over-disclosure.
+
+------------------------------------------------------------
+3. Dual-router combined steering
+------------------------------------------------------------
+
+Goal:
+Combine over and under correction by routing among cached outputs.
+
+This is NOT simultaneous vector addition.
+
+Routing rule:
+if g_privacy = 1:
+    use over-steered output
+elif g_allowed = 1:
+    use under-steered output
+else:
+    use base output
+
+Conflict rule:
+over-first
+
+Note:
+On both val and test, there are no cases where both gates are true.
+Therefore over_first, under_first, conflict_base, and conflict_score_margin all produce the same metrics.
+
+============================================================
+Validation results
+============================================================
+
+Dataset:
+val n = 238
+
+------------------------------------------------------------
+Base
+------------------------------------------------------------
+Correct: 72/238 = 0.303
+Over-disclosure: 103/238 = 0.433
+Under-disclosure: 63/238 = 0.265
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+Correct: 74/238 = 0.311
+Over-disclosure: 102/238 = 0.429
+Under-disclosure: 62/238 = 0.261
+Gate true: 153/238
+
+Change from base:
+Correct: +2
+Over-disclosure: -1
+Under-disclosure: -1
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+Correct: 79/238 = 0.332
+Over-disclosure: 103/238 = 0.433
+Under-disclosure: 56/238 = 0.235
+Gate true: 25/238
+
+Change from base:
+Correct: +7
+Over-disclosure: 0
+Under-disclosure: -7
+
+Note:
+The aggressive under setting reduced under more, but increased over-disclosure.
+The safe under setting is preferred because it does not increase over-disclosure.
+
+------------------------------------------------------------
+3. Dual-router combined steering
+------------------------------------------------------------
+Correct: 81/238 = 0.340
+Over-disclosure: 102/238 = 0.429
+Under-disclosure: 55/238 = 0.231
+
+Gate/action counts:
+over only = 153
+under only = 25
+both = 0
+neither = 60
+
+Action counts:
+over = 153
+under = 25
+base = 60
+
+Change from base:
+Correct: +9
+Over-disclosure: -1
+Under-disclosure: -8
+
+Note:
+Combined router improves correctness and under-disclosure more than either single safe conditional method, while preserving the small over-disclosure reduction from over-only steering.
+
+============================================================
+Test results
+============================================================
+
+Dataset:
+test n = 243
+
+------------------------------------------------------------
+Base
+------------------------------------------------------------
+Correct: 88/243 = 0.362
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 52/243 = 0.214
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+Correct: 89/243 = 0.366
+Over-disclosure: 102/243 = 0.420
+Under-disclosure: 52/243 = 0.214
+Gate true: 151/243
+
+Change from base:
+Correct: +1
+Over-disclosure: -1
+Under-disclosure: 0
+
+Note:
+Over-only conditional steering gives a very small improvement.
+The weak effect is consistent with the behavior-vector composition: the positive side lacks A_to_A examples.
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+Correct: 91/243 = 0.374
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 49/243 = 0.202
+Gate true: 32/243
+
+Change from base:
+Correct: +3
+Over-disclosure: 0
+Under-disclosure: -3
+
+Note:
+Safe under conditional steering improves correctness and under-disclosure without increasing over-disclosure.
+
+------------------------------------------------------------
+3. Dual-router combined steering
+------------------------------------------------------------
+Correct: 92/243 = 0.379
+Over-disclosure: 102/243 = 0.420
+Under-disclosure: 49/243 = 0.202
+
+Gate/action counts:
+over only = 151
+under only = 32
+both = 0
+neither = 60
+
+Action counts:
+over = 151
+under = 32
+base = 60
+
+Change from base:
+Correct: +4
+Over-disclosure: -1
+Under-disclosure: -3
+
+Note:
+Dual-router combined steering is the best completed Llama setting.
+It combines the small over-disclosure reduction from over-only steering with the under-disclosure reduction from safe under steering.
+
+============================================================
+Main conclusions
+============================================================
+
+1. Llama-3.2-11B-Vision has the desired opposite baseline tendency from Qwen2.5-VL-3B:
+it is much more over-disclosure-heavy than under-disclosure-heavy.
+
+2. The over behavior vector is weak for Llama.
+It reduces over-disclosure by only one case on val/test under the selected conditional setting.
+The likely cause is that the behavior-positive training set contains only B_to_B and no A_to_A examples, so the vector does not learn a strong abstention/refusal direction.
+
+3. The under behavior vector works better.
+The safe conditional setting improves correctness and reduces under-disclosure without increasing over-disclosure.
+
+4. The combined router gives the best completed test result:
+Correct +4, Over -1, Under -3 compared with base.
+
+5. Because both gates never fire together under the selected thresholds, all cached-router conflict strategies produce the same result.
+This also means dual-additive may not add much under the current gate configuration.
+
+============================================================
+Main results table should include
+============================================================
+
+Base:
+Correct 88/243 = 0.362
+Over 103/243 = 0.424
+Under 52/243 = 0.214
+
+Over-only conditional:
+Correct 89/243 = 0.366
+Over 102/243 = 0.420
+Under 52/243 = 0.214
+
+Under-only safe conditional:
+Correct 91/243 = 0.374
+Over 103/243 = 0.424
+Under 49/243 = 0.202
+
+Dual-router combined:
+Correct 92/243 = 0.379
+Over 102/243 = 0.420
+Under 49/243 = 0.202
+
+Dual-additive:
+Not run for Llama-3.2-11B-Vision.
+Under the current selected thresholds, the over and under gates never overlap on val or test, so the cached-router combined setting already captures the available non-conflicting over/under corrections.
+
+Possible paper wording:
+For Llama-3.2-11B-Vision, the combined router achieves the best completed overall result, improving correctness while reducing both over- and under-disclosure relative to the base model. The improvement is modest because the over-disclosure behavior vector is weak for this model, but the under-disclosure vector provides a useful safe correction. Unlike Qwen2.5-VL-3B, the selected over and under gates do not overlap, so all router conflict strategies produce the same result and dual-additive steering is not expected to provide a meaningful simultaneous-vector advantage under this gate configuration.

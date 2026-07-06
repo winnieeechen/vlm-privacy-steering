@@ -1,0 +1,45 @@
+experiment:
+  name: qwen25vl3b_full1200_under
+  stage: formal_full1200
+  method: under_disclosure_steering
+  publish: true
+  description: "Formal full1200 experiment for reducing under-disclosure."
+
+model:
+  name: Qwen/Qwen2.5-VL-3B-Instruct
+  short_name: qwen25vl3b
+
+data:
+  image_dir: data/02_full1200/images
+  metadata_dir: data/02_full1200/metadata
+  train_csv: data/02_full1200/metadata/geoprivacy_available_train.csv
+  val_csv: data/02_full1200/metadata/geoprivacy_available_val.csv
+  test_csv: data/02_full1200/metadata/geoprivacy_available_test.csv
+
+outputs:
+  root_dir: outputs/02_formal_full1200/03_under
+  vector_cases_dir: outputs/02_formal_full1200/03_under/vector_cases
+  vectors_dir: outputs/02_formal_full1200/03_under/vectors
+  scores_dir: outputs/02_formal_full1200/03_under/scores
+  steering_dir: outputs/02_formal_full1200/03_under/steering
+  sweeps_dir: outputs/02_formal_full1200/03_under/sweeps
+
+condition_vector:
+  positive_true_labels: ["B", "C"]
+  negative_true_labels: ["A"]
+
+behavior_vector:
+  positive_transitions: ["B_to_B", "C_to_C"]
+  negative_transitions: ["B_to_A", "C_to_A", "C_to_B"]
+
+steering:
+  layer: 32
+  alpha: 0.5
+  threshold: 0.04
+  gate_direction: larger
+
+metrics:
+  main:
+    - accuracy
+    - over_disclosure_rate
+    - under_disclosure_rate

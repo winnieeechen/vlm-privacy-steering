@@ -1,0 +1,121 @@
+Combined original-logic full1200 experiment
+
+Goal:
+Combine over-disclosure steering and under-disclosure steering.
+
+Over logic:
+Over condition vector:
+positive = true A/B
+negative = true C
+
+Over behavior vector:
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+
+Over threshold selected on val:
+threshold = -0.03
+
+Under logic:
+Under condition vector:
+positive = true B/C
+negative = true A
+
+Under behavior vector:
+positive = B_to_B, C_to_C
+negative = B_to_A, C_to_A, C_to_B
+
+Safe under threshold selected on val:
+threshold = 0.04
+
+Combined cached routing idea:
+Use existing cached predictions:
+1. base predictions
+2. over-steered predictions
+3. under-steered predictions
+4. over condition scores
+5. under condition scores
+
+Then compare different routing strategies on val:
+- over_first
+- under_first
+- conflict_base
+- conflict_score_margin
+
+Combined cached routing results
+
+Val setting:
+over threshold = -0.03
+under threshold = 0.04
+
+Val base:
+Correct 83/238 = 0.349
+Over 40/238 = 0.168
+Under 115/238 = 0.483
+
+Val over unconditional:
+Correct 93/238 = 0.391
+Over 22/238 = 0.092
+Under 123/238 = 0.517
+
+Val under unconditional:
+Correct 85/238 = 0.357
+Over 42/238 = 0.176
+Under 111/238 = 0.466
+
+Val combined over_first:
+Correct 94/238 = 0.395
+Over 22/238 = 0.092
+Under 122/238 = 0.513
+
+Val combined under_first:
+Correct 92/238 = 0.387
+Over 27/238 = 0.113
+Under 119/238 = 0.500
+
+Val combined conflict_base:
+Correct 91/238 = 0.382
+Over 27/238 = 0.113
+Under 120/238 = 0.504
+
+Val combined conflict_score_margin:
+Correct 94/238 = 0.395
+Over 24/238 = 0.101
+Under 120/238 = 0.504
+
+Test base:
+Correct 87/243 = 0.358
+Over 44/243 = 0.181
+Under 112/243 = 0.461
+
+Test over unconditional:
+Correct 94/243 = 0.387
+Over 30/243 = 0.123
+Under 119/243 = 0.490
+
+Test under unconditional:
+Correct 83/243 = 0.342
+Over 51/243 = 0.210
+Under 109/243 = 0.449
+
+Test combined over_first:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Test combined under_first:
+Correct 95/243 = 0.391
+Over 34/243 = 0.140
+Under 114/243 = 0.469
+
+Test combined conflict_base:
+Correct 94/243 = 0.387
+Over 34/243 = 0.140
+Under 115/243 = 0.473
+
+Test combined conflict_score_margin:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Main combined conclusion:
+The over_first combined routing is the preferred main strategy. It achieves the same correctness improvement as under_first, but keeps over-disclosure lower. Since privacy risk is mainly associated with over-disclosure, prioritizing the over-disclosure correction vector in conflicts is the safer design choice.

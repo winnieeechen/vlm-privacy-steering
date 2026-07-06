@@ -1,0 +1,35 @@
+experiment:
+  name: qwen25vl3b_full1200_combined_router
+  stage: formal_full1200
+  method: combined_router
+  publish: true
+  description: "Cached routing experiment combining base, over-steered, and under-steered outputs."
+
+inputs:
+  base_val_csv: outputs/02_formal_full1200/00_base/base_qwen_vl_val_238.csv
+  base_test_csv: outputs/02_formal_full1200/00_base/base_qwen_vl_test_243.csv
+
+  over_val_csv: outputs/02_formal_full1200/02_over/steering/steered_qwen_vl_val_layer32_alpha0.5.csv
+  over_test_csv: outputs/02_formal_full1200/02_over/steering/steered_qwen_vl_test_layer32_alpha0.5.csv
+
+  under_val_csv: outputs/02_formal_full1200/03_under/steering/under_steered_qwen_vl_val_layer32_alpha0.5.csv
+  under_test_csv: outputs/02_formal_full1200/03_under/steering/under_steered_qwen_vl_test_layer32_alpha0.5.csv
+
+  over_scores_val_csv: outputs/02_formal_full1200/02_over/scores/condition_scores_val_layer32.csv
+  over_scores_test_csv: outputs/02_formal_full1200/02_over/scores/condition_scores_test_layer32.csv
+
+  under_scores_val_csv: outputs/02_formal_full1200/03_under/scores/under_condition_scores_val_layer32.csv
+  under_scores_test_csv: outputs/02_formal_full1200/03_under/scores/under_condition_scores_test_layer32.csv
+
+router:
+  over_threshold: -0.03
+  under_threshold: 0.04
+  priority: over_first
+
+outputs:
+  root_dir: outputs/02_formal_full1200/04_combined_router
+  val_dir: outputs/02_formal_full1200/04_combined_router/val
+  test_dir: outputs/02_formal_full1200/04_combined_router/test
+
+notes:
+  description: "This is cached output routing, not true simultaneous activation steering."

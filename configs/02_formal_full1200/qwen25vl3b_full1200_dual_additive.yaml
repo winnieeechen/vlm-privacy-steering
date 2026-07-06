@@ -1,0 +1,43 @@
+experiment:
+  name: qwen25vl3b_full1200_dual_additive
+  stage: formal_full1200
+  method: dual_additive
+  publish: true
+  description: "True combined activation steering with both over and under vectors added in the same forward pass."
+
+model:
+  name: Qwen/Qwen2.5-VL-3B-Instruct
+  short_name: qwen25vl3b
+
+data:
+  image_dir: data/02_full1200/images
+  val_csv: data/02_full1200/metadata/geoprivacy_available_val.csv
+  test_csv: data/02_full1200/metadata/geoprivacy_available_test.csv
+
+vectors:
+  over_behavior_vector: outputs/02_formal_full1200/02_over/vectors/behavior_vectors_full1200.pt
+  under_behavior_vector: outputs/02_formal_full1200/03_under/vectors/under_behavior_vectors_full1200.pt
+
+scores:
+  over_val_scores: outputs/02_formal_full1200/02_over/scores/condition_scores_val_layer32.csv
+  over_test_scores: outputs/02_formal_full1200/02_over/scores/condition_scores_test_layer32.csv
+
+  under_val_scores: outputs/02_formal_full1200/03_under/scores/under_condition_scores_val_layer32.csv
+  under_test_scores: outputs/02_formal_full1200/03_under/scores/under_condition_scores_test_layer32.csv
+
+steering:
+  layer: 32
+  alpha_over: 0.5
+  alpha_under: 0.5
+  over_threshold: -0.03
+  under_threshold: 0.04
+  over_gate_direction: larger
+  under_gate_direction: larger
+
+formula:
+  description: "h' = h + g_privacy * alpha_over * v_privacy + g_allowed * alpha_under * v_utility"
+
+outputs:
+  root_dir: outputs/02_formal_full1200/05_dual_additive
+  val_dir: outputs/02_formal_full1200/05_dual_additive/val
+  test_dir: outputs/02_formal_full1200/05_dual_additive/test

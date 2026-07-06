@@ -1,0 +1,372 @@
+Four-method results summary
+Original-logic full1200 experiment
+Layer = 32
+
+This note summarizes four steering methods:
+
+1. Over-only conditional steering
+2. Under-only safe conditional steering
+3. Dual-router combined steering
+4. Dual-additive combined steering
+
+Base model is included as reference.
+
+============================================================
+Method definitions
+============================================================
+
+Base:
+No activation steering.
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+
+Goal:
+Reduce over-disclosure.
+
+Condition vector:
+positive = true A/B
+negative = true C
+
+Behavior vector:
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+
+Formula:
+h' = h + g_privacy * alpha_over * v_privacy
+
+Gate:
+g_privacy = 1 if over condition score >= -0.03
+g_privacy = 0 otherwise
+
+Setting:
+layer = 32
+alpha_over = 0.5
+over threshold = -0.03
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+
+Goal:
+Reduce under-disclosure while avoiding increased over-disclosure.
+
+Condition vector:
+positive = true B/C
+negative = true A
+
+Behavior vector:
+positive = B_to_B, C_to_C
+negative = B_to_A, C_to_A, C_to_B
+
+Formula:
+h' = h + g_allowed * alpha_under * v_utility
+
+Gate:
+g_allowed = 1 if under condition score >= 0.04
+g_allowed = 0 otherwise
+
+Setting:
+layer = 32
+alpha_under = 0.5
+under threshold = 0.04
+
+------------------------------------------------------------
+3. Dual-router combined steering
+------------------------------------------------------------
+
+Goal:
+Combine over and under correction by routing among cached outputs.
+
+This is NOT simultaneous vector addition.
+
+Routing rule:
+if g_privacy = 1:
+    use over-steered output
+elif g_allowed = 1:
+    use under-steered output
+else:
+    use base output
+
+Conflict rule:
+over-first
+
+Meaning:
+When both over gate and under gate are true, prioritize over-disclosure correction.
+
+Reason:
+Over-disclosure is the main privacy risk, so privacy safety has priority over utility recovery.
+
+------------------------------------------------------------
+4. Dual-additive combined steering
+------------------------------------------------------------
+
+Goal:
+Run true combined activation steering by adding both over and under vectors in the same forward pass.
+
+Formula:
+h'_{l,t} = h_{l,t}
+          + g_privacy * alpha_over * v_privacy,l
+          + g_allowed * alpha_under * v_utility,l
+
+Gate:
+g_privacy = 1 if over condition score >= -0.03
+g_allowed = 1 if under condition score >= 0.04
+
+Setting:
+layer = 32
+alpha_over = 0.5
+alpha_under = 0.5
+over threshold = -0.03
+under threshold = 0.04
+
+
+============================================================
+Validation results
+============================================================
+
+Dataset:
+val n = 238
+
+------------------------------------------------------------
+Base
+------------------------------------------------------------
+Correct: 83/238 = 0.349
+Over-disclosure: 40/238 = 0.168
+Under-disclosure: 115/238 = 0.483
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+Correct: 94/238 = 0.395
+Over-disclosure: 22/238 = 0.092
+Under-disclosure: 122/238 = 0.513
+Gate true: 147/238
+
+Change from base:
+Correct: +11
+Over-disclosure: -18
+Under-disclosure: +7
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+Correct: 84/238 = 0.353
+Over-disclosure: 40/238 = 0.168
+Under-disclosure: 114/238 = 0.479
+
+Change from base:
+Correct: +1
+Over-disclosure: 0
+Under-disclosure: -1
+
+Note:
+The aggressive under setting reduced under more, but increased over-disclosure.
+The safe under setting is preferred because it does not increase over-disclosure.
+
+------------------------------------------------------------
+3. Dual-router combined steering, over_first
+------------------------------------------------------------
+Correct: 94/238 = 0.395
+Over-disclosure: 22/238 = 0.092
+Under-disclosure: 122/238 = 0.513
+
+Gate/action counts:
+over only = 117
+under only = 91
+both = 30
+
+Change from base:
+Correct: +11
+Over-disclosure: -18
+Under-disclosure: +7
+
+Note:
+On val, dual-router over_first gives the same final metrics as over-only conditional steering.
+
+------------------------------------------------------------
+4. Dual-additive combined steering
+------------------------------------------------------------
+Correct: 93/238 = 0.391
+Over-disclosure: 23/238 = 0.097
+Under-disclosure: 122/238 = 0.513
+
+Gate counts:
+over only = 117
+under only = 91
+both = 30
+
+Change from base:
+Correct: +10
+Over-disclosure: -17
+Under-disclosure: +7
+
+Note:
+Dual-additive is the true implementation of simultaneous combined steering.
+On val, it is slightly worse than dual-router over_first.
+
+
+============================================================
+Test results
+============================================================
+
+Dataset:
+test n = 243
+
+------------------------------------------------------------
+Base
+------------------------------------------------------------
+Correct: 87/243 = 0.358
+Over-disclosure: 44/243 = 0.181
+Under-disclosure: 112/243 = 0.461
+
+------------------------------------------------------------
+1. Over-only conditional steering
+------------------------------------------------------------
+Correct: 95/243 = 0.391
+Over-disclosure: 30/243 = 0.123
+Under-disclosure: 118/243 = 0.486
+Gate true: 134/243
+
+Change from base:
+Correct: +8
+Over-disclosure: -14
+Under-disclosure: +6
+
+------------------------------------------------------------
+2. Under-only safe conditional steering
+------------------------------------------------------------
+Correct: 88/243 = 0.362
+Over-disclosure: 44/243 = 0.181
+Under-disclosure: 111/243 = 0.457
+Gate true: 141/243
+
+Change from base:
+Correct: +1
+Over-disclosure: 0
+Under-disclosure: -1
+
+Note:
+Safe under conditional steering slightly improves correctness and under-disclosure without increasing over-disclosure.
+
+------------------------------------------------------------
+3. Dual-router combined steering, over_first
+------------------------------------------------------------
+Correct: 95/243 = 0.391
+Over-disclosure: 30/243 = 0.123
+Under-disclosure: 118/243 = 0.486
+
+Gate/action counts:
+over only = 102
+under only = 109
+both = 32
+
+Change from base:
+Correct: +8
+Over-disclosure: -14
+Under-disclosure: +6
+
+Note:
+Dual-router over_first prioritizes privacy safety in conflicts.
+It keeps over-disclosure low, but under-disclosure still increases compared with base.
+
+------------------------------------------------------------
+4. Dual-additive combined steering
+------------------------------------------------------------
+Correct: 96/243 = 0.395
+Over-disclosure: 31/243 = 0.128
+Under-disclosure: 116/243 = 0.477
+
+Gate counts:
+over only = 102
+under only = 109
+both = 32
+
+Change from base:
+Correct: +9
+Over-disclosure: -13
+Under-disclosure: +4
+
+Comparison with dual-router over_first:
+Dual-router over_first:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Dual-additive:
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Difference:
+Correct: +1
+Over-disclosure: +1
+Under-disclosure: -2
+
+
+============================================================
+Main takeaways
+============================================================
+
+1. Over-only conditional steering is the strongest privacy-safety method.
+It substantially reduces over-disclosure and improves correctness, but increases under-disclosure.
+
+2. Under-only safe conditional steering has a small but clean utility benefit.
+It slightly reduces under-disclosure and improves correctness without increasing over-disclosure.
+
+3. Dual-router over_first is a privacy-prioritized combined strategy.
+It chooses among base, over-steered, and under-steered cached outputs.
+Its test result is strong for over-disclosure reduction, but it does not improve under-disclosure compared with over-only conditional.
+
+4. Dual-additive is the true formula-based combined steering method.
+It applies both vectors in the same forward pass:
+h' = h + g_privacy * alpha_over * v_privacy + g_allowed * alpha_under * v_utility
+
+On test, dual-additive gives the best correctness:
+Correct 96/243 = 0.395
+
+It also reduces over-disclosure substantially:
+Over 44 -> 31
+
+Compared with dual-router over_first, dual-additive has:
++1 correct
+-2 under-disclosure
++1 over-disclosure
+
+Therefore, dual-additive is a promising balanced variant, while dual-router over_first remains the safer privacy-first variant.
+
+
+============================================================
+Recommended reporting
+============================================================
+
+Main results table should include:
+
+Base:
+Correct 87/243 = 0.358
+Over 44/243 = 0.181
+Under 112/243 = 0.461
+
+Over-only conditional:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Under-only safe conditional:
+Correct 88/243 = 0.362
+Over 44/243 = 0.181
+Under 111/243 = 0.457
+
+Dual-router over_first:
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Dual-additive:
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Possible paper wording:
+Dual-additive steering achieves the highest overall correctness and a better under-disclosure trade-off than dual-router, while still substantially reducing over-disclosure compared with the base model. Dual-router over_first is the more conservative privacy-first strategy because it achieves the lowest over-disclosure.

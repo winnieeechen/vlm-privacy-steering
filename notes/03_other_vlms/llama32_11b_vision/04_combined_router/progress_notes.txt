@@ -1,0 +1,159 @@
+Llama-3.2-11B-Vision combined router notes
+
+Goal:
+Combine over-disclosure correction and under-disclosure correction using cached routing.
+This follows the Qwen combined-router setup, but uses the Llama-selected settings.
+
+Model:
+meta-llama/Llama-3.2-11B-Vision-Instruct
+
+Dataset:
+Same original-logic full1200 split.
+
+Val: 238
+Test: 243
+
+============================================================
+Inputs and selected settings
+============================================================
+
+Base outputs:
+outputs/03_other_vlms/llama32_11b_vision/00_base/val/base_llama32_vision_val_238.csv
+outputs/03_other_vlms/llama32_11b_vision/00_base/test/base_llama32_vision_test_243.csv
+
+Over steering:
+behavior layer: 24
+alpha: 1.0
+condition layer: 32
+threshold: 0.04
+
+Over steered outputs:
+outputs/03_other_vlms/llama32_11b_vision/02_over/val/steered_llama32_vision_val_layer24_alpha1.0.csv
+outputs/03_other_vlms/llama32_11b_vision/02_over/test/steered_llama32_vision_test_layer24_alpha1.0.csv
+
+Over condition scores:
+outputs/03_other_vlms/llama32_11b_vision/02_over/val/condition_scores_val_layer32.csv
+outputs/03_other_vlms/llama32_11b_vision/02_over/test/condition_scores_test_layer32.csv
+
+Under steering:
+behavior layer: 32
+alpha: 0.5
+condition layer: 32
+threshold: 0.10
+
+Under steered outputs:
+outputs/03_other_vlms/llama32_11b_vision/03_under/val/under_steered_llama32_vision_val_layer32_alpha0.5.csv
+outputs/03_other_vlms/llama32_11b_vision/03_under/test/under_steered_llama32_vision_test_layer32_alpha0.5.csv
+
+Under condition scores:
+outputs/03_other_vlms/llama32_11b_vision/03_under/val/under_condition_scores_val_layer32.csv
+outputs/03_other_vlms/llama32_11b_vision/03_under/test/under_condition_scores_test_layer32.csv
+
+Router script:
+scripts/03_other_vlms/llama32_11b_vision/04_combined_router/01_cached_combined_routing.py
+
+============================================================
+Val results
+============================================================
+
+Summary output:
+outputs/03_other_vlms/llama32_11b_vision/04_combined_router/val/combined_val_summary_over24_under32.csv
+
+Base:
+Correct: 72/238 = 0.303
+Over-disclosure: 103/238 = 0.433
+Under-disclosure: 63/238 = 0.265
+
+Over unconditional:
+Correct: 69/238 = 0.290
+Over-disclosure: 101/238 = 0.424
+Under-disclosure: 68/238 = 0.286
+
+Under unconditional:
+Correct: 86/238 = 0.361
+Over-disclosure: 106/238 = 0.445
+Under-disclosure: 46/238 = 0.193
+
+Combined router:
+Correct: 81/238 = 0.340
+Over-disclosure: 102/238 = 0.429
+Under-disclosure: 55/238 = 0.231
+
+Change from base:
+Correct: +9
+Over-disclosure: -1
+Under-disclosure: -8
+
+Action counts:
+base: 60
+over: 153
+under: 25
+
+Gate counts:
+over only: 153
+under only: 25
+both: 0
+neither: 60
+
+Note:
+There were no over/under gate conflicts on val, so all routing strategies produced the same result:
+over_first, under_first, conflict_base, conflict_score_margin.
+
+============================================================
+Test results
+============================================================
+
+Summary output:
+outputs/03_other_vlms/llama32_11b_vision/04_combined_router/test/combined_test_summary_over24_under32.csv
+
+Base:
+Correct: 88/243 = 0.362
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 52/243 = 0.214
+
+Over unconditional:
+Correct: 82/243 = 0.337
+Over-disclosure: 102/243 = 0.420
+Under-disclosure: 59/243 = 0.243
+
+Under unconditional:
+Correct: 95/243 = 0.391
+Over-disclosure: 104/243 = 0.428
+Under-disclosure: 44/243 = 0.181
+
+Combined router:
+Correct: 92/243 = 0.379
+Over-disclosure: 102/243 = 0.420
+Under-disclosure: 49/243 = 0.202
+
+Change from base:
+Correct: +4
+Over-disclosure: -1
+Under-disclosure: -3
+
+Action counts:
+base: 60
+over: 151
+under: 32
+
+Gate counts:
+over only: 151
+under only: 32
+both: 0
+neither: 60
+
+Note:
+There were no over/under gate conflicts on test, so all routing strategies produced the same result:
+over_first, under_first, conflict_base, conflict_score_margin.
+
+============================================================
+Observation
+============================================================
+
+The combined router is better than either standalone safe final correction on test:
+- over-only final conditional: Correct +1, Over -1, Under 0
+- under-only final conditional: Correct +3, Over 0, Under -3
+- combined router: Correct +4, Over -1, Under -3
+
+The combined result is still modest, mainly because the over behavior vector is weak for Llama.
+The under vector contributes most of the utility gain, while the over route gives a small over-disclosure reduction.

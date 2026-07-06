@@ -1,0 +1,16 @@
+# External reference repositories
+external/
+
+# Model/vector checkpoints
+*.pt
+*.pth
+*.safetensors
+*.svec
+
+# Python cache
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store
+.vscode/

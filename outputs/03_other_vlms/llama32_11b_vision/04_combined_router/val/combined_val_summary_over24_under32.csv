@@ -1,0 +1,5 @@
+strategy,correct,correct_rate,over,over_rate,under,under_rate,action_base,action_over,action_under,gate_over_only,gate_under_only,gate_both,gate_neither,output_csv
+over_first,81,0.3403361344537815,102,0.42857142857142855,55,0.23109243697478993,60,153,25,153,25,0,60,/home/wc221/vlm-privacy-steering/outputs/03_other_vlms/llama32_11b_vision/04_combined_router/val/combined_val_over_first_over24_under32.csv
+under_first,81,0.3403361344537815,102,0.42857142857142855,55,0.23109243697478993,60,153,25,153,25,0,60,/home/wc221/vlm-privacy-steering/outputs/03_other_vlms/llama32_11b_vision/04_combined_router/val/combined_val_under_first_over24_under32.csv
+conflict_base,81,0.3403361344537815,102,0.42857142857142855,55,0.23109243697478993,60,153,25,153,25,0,60,/home/wc221/vlm-privacy-steering/outputs/03_other_vlms/llama32_11b_vision/04_combined_router/val/combined_val_conflict_base_over24_under32.csv
+conflict_score_margin,81,0.3403361344537815,102,0.42857142857142855,55,0.23109243697478993,60,153,25,153,25,0,60,/home/wc221/vlm-privacy-steering/outputs/03_other_vlms/llama32_11b_vision/04_combined_router/val/combined_val_conflict_score_margin_over24_under32.csv

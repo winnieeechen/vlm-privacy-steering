@@ -1,0 +1,207 @@
+Original-logic full1200 reproduction notes
+
+Goal:
+Re-run the full1200 experiment using the original 600-image code logic.
+Do not use the later A-router logic.
+
+Original logic to preserve:
+
+1. Condition vector
+positive = true A/B
+negative = true C
+
+This condition vector is used to detect whether an image-question pair is privacy-sensitive,
+i.e., whether exact location disclosure should not be allowed.
+
+2. Behavior vector
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+
+This behavior vector is used to reduce over-disclosure.
+
+Important:
+The original 600-image experiment used raw behavior vector, not normalized vector.
+So the full1200 reproduction should also use raw behavior vector.
+
+Dataset:
+Available images: 1198
+Train: 717
+Val: 238
+Test: 243
+
+Current files:
+Images:
+data/images_full1200/
+
+Full1200 split files:
+data/full1200/geoprivacy_available_train.csv
+data/full1200/geoprivacy_available_val.csv
+data/full1200/geoprivacy_available_test.csv
+
+Original-logic output directory:
+outputs/original_logic_full1200/
+
+Base inference status using old script 20_run_qwen_vl_base.py:
+
+Train base:
+outputs/original_logic_full1200/base_qwen_vl_train_717.csv
+
+Train rows: 717
+Pred counts:
+A: 248
+B: 462
+C: 7
+
+Train case counts:
+C_to_B: 229
+A_to_A: 155
+A_to_B: 134
+B_to_B: 99
+C_to_A: 49
+B_to_A: 44
+C_to_C: 5
+A_to_C: 1
+B_to_C: 1
+
+Val base:
+outputs/original_logic_full1200/base_qwen_vl_val_238.csv
+Status: missing / not run yet
+
+Test base:
+outputs/original_logic_full1200/base_qwen_vl_test_243.csv
+Status: missing / not run yet
+
+Next step:
+Run old-script base inference for val and test using 20_run_qwen_vl_base.py.
+
+After train/val/test base are complete:
+Run 09_build_vector_training_tables.py to build original-logic vector training tables.
+
+Then extract:
+- condition vector: true A/B vs true C
+- behavior vector: A_to_A, B_to_B vs A_to_B, A_to_C, B_to_C
+
+Then evaluate:
+- unconditional raw behavior steering
+- conditional steering using the original condition vector
+
+Final original-logic full1200 results
+
+Vectors:
+Condition vector:
+positive = true A/B
+negative = true C
+positive_count = 434
+negative_count = 283
+saved = outputs/original_logic_full1200/vectors/condition_vectors_full1200.pt
+
+Behavior vector:
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+positive_count = 254
+negative_count = 136
+saved = outputs/original_logic_full1200/vectors/behavior_vectors_full1200.pt
+
+Val results, layer 32 alpha 0.5:
+Base:
+Correct 83/238 = 0.349
+Over 40/238 = 0.168
+Under 115/238 = 0.483
+
+Unconditional steering:
+Correct 93/238 = 0.391
+Over 22/238 = 0.092
+Under 123/238 = 0.517
+
+Best conditional on val:
+threshold = -0.03
+gate_true = 147/238
+Correct 94/238 = 0.395
+Over 22/238 = 0.092
+Under 122/238 = 0.513
+
+Test results, layer 32 alpha 0.5, threshold fixed from val = -0.03:
+Base:
+Correct 87/243 = 0.358
+Over 44/243 = 0.181
+Under 112/243 = 0.461
+
+Unconditional steering:
+Correct 94/243 = 0.387
+Over 30/243 = 0.123
+Under 119/243 = 0.490
+
+Final conditional steering:
+threshold = -0.03
+gate_true = 134/243
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Main conclusion:
+Original-logic conditional activation steering improves correctness and substantially reduces over-disclosure compared with the base model. Compared with unconditional steering, the condition gate gives a small additional improvement in correctness and under-disclosure, while keeping over-disclosure unchanged.
+
+Under-disclosure original-logic full1200 results
+
+Under vector logic:
+Condition vector:
+positive = true B/C
+negative = true A
+positive_count = 427
+negative_count = 290
+saved = outputs/original_logic_full1200_under/vectors/under_condition_vectors_full1200.pt
+
+Behavior vector:
+positive = B_to_B, C_to_C
+negative = B_to_A, C_to_A, C_to_B
+positive_count = 104
+negative_count = 322
+saved = outputs/original_logic_full1200_under/vectors/under_behavior_vectors_full1200.pt
+
+Val results, layer 32 alpha 0.5:
+Base:
+Correct 83/238 = 0.349
+Over 40/238 = 0.168
+Under 115/238 = 0.483
+
+Unconditional under steering:
+Correct 85/238 = 0.357
+Over 42/238 = 0.176
+Under 111/238 = 0.466
+
+Val conditional under sweep:
+Aggressive threshold = -0.02
+Correct 85/238 = 0.357
+Over 42/238 = 0.176
+Under 111/238 = 0.466
+
+Safe threshold = 0.04
+Correct 84/238 = 0.353
+Over 40/238 = 0.168
+Under 114/238 = 0.479
+
+Test results, layer 32 alpha 0.5:
+Base:
+Correct 87/243 = 0.358
+Over 44/243 = 0.181
+Under 112/243 = 0.461
+
+Unconditional under steering:
+Correct 83/243 = 0.342
+Over 51/243 = 0.210
+Under 109/243 = 0.449
+
+Under conditional aggressive threshold = -0.02:
+gate_true = 236/243
+Correct 83/243 = 0.342
+Over 51/243 = 0.210
+Under 109/243 = 0.449
+
+Under conditional safe threshold = 0.04:
+gate_true = 141/243
+Correct 88/243 = 0.362
+Over 44/243 = 0.181
+Under 111/243 = 0.457
+
+Main under conclusion:
+The under behavior vector can reduce under-disclosure, but unconditional use increases over-disclosure and hurts correctness on test. A safer conditional gate with threshold 0.04 avoids increasing over-disclosure and slightly improves correctness and under-disclosure compared with the base model.
