@@ -41,6 +41,32 @@ def make_case(true_label, pred_label):
     return f"{true_label}_to_{pred_label}"
 
 
+def resolve_image_path(row):
+    candidates = []
+    if row.get("image_path"):
+        candidates.append(Path(row["image_path"]))
+    if row.get("image_name"):
+        candidates.extend([
+            ROOT / "data" / "02_full1200" / "images" / row["image_name"],
+            ROOT / "data" / "images_full1200" / row["image_name"],
+            ROOT / "data" / "01_pilot_649" / "images" / row["image_name"],
+        ])
+    if row.get("image_stem"):
+        candidates.extend([
+            ROOT / "data" / "02_full1200" / "images" / f"{row['image_stem']}.jpg",
+            ROOT / "data" / "01_pilot_649" / "images" / f"{row['image_stem']}.jpg",
+        ])
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+
+    raise FileNotFoundError(
+        f"Cannot find image for {row.get('full_id')}. Tried: "
+        + ", ".join(str(p) for p in candidates)
+    )
+
+
 def build_inputs(processor, image_path):
     messages = [{
         "role": "user",
@@ -146,11 +172,13 @@ def main():
         rows = list(csv.DictReader(f))
 
     payload = torch.load(vector_path, map_location="cpu")
-    v = payload["under_B_behavior_vector"][args.layer].float()
+    vector_key = "behavior_vector" if "behavior_vector" in payload else "under_B_behavior_vector"
+    v = payload[vector_key][args.layer].float()
 
     print("Rows:", len(rows))
     print("Base CSV:", base_csv)
-    print("Under-B vector:", vector_path)
+    print("Under vector:", vector_path)
+    print("Vector key:", vector_key)
     print("Layer:", args.layer)
     print("Alpha:", args.alpha)
     print("Vector norm:", float(v.norm()))
@@ -170,7 +198,7 @@ def main():
     results = []
 
     for i, row in enumerate(rows, 1):
-        answer, pred = run_generation(model, processor, row["image_path"])
+        answer, pred = run_generation(model, processor, resolve_image_path(row))
         case = make_case(row["true_label"], pred)
 
         rr = dict(row)
@@ -198,7 +226,7 @@ def main():
     print("\nBase summary:")
     summarize(results, "pred_label", "case_type")
 
-    print("\nUnder-B steered summary:")
+    print("\nUnder steered summary:")
     summarize(results, "under_pred_label", "under_case_type")
 
     print("\nSaved:", out_csv)

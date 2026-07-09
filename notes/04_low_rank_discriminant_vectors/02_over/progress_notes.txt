@@ -1,0 +1,222 @@
+Low-rank discriminant vectors: 02_over validation notes
+
+Experiment
+----------
+Method family:
+low_rank_discriminant_vectors
+
+Selected vector method:
+fisher_pca
+
+Vector type:
+1. condition_vector
+2. behavior_vector
+
+Goal:
+Reduce over-disclosure using the same high-level logic as the original
+full1200 over-disclosure experiment, but replace the raw mean-difference
+vectors with low-rank Fisher/PCA vectors.
+
+
+
+Setting
+-------
+Dataset:
+val n = 238
+
+Layer:
+32
+
+Alpha:
+0.5
+
+Condition score:
+cosine similarity between the layer-32 hidden state and the selected
+condition_vector_unit.
+
+
+Base result
+-----------
+Correct:
+83/238 = 0.349
+
+Over-disclosure:
+40/238 = 0.168
+
+Under-disclosure:
+115/238 = 0.483
+
+Case counts:
+A_to_A = 57
+A_to_B = 40
+B_to_A = 21
+B_to_B = 26
+C_to_A = 16
+C_to_B = 78
+
+
+Unconditional fisher_pca over steering
+--------------------------------------
+Correct:
+86/238 = 0.361
+
+Over-disclosure:
+37/238 = 0.155
+
+Under-disclosure:
+115/238 = 0.483
+
+Change from base:
+Correct: +3
+Over-disclosure: -3
+Under-disclosure: 0
+
+Interpretation:
+The fisher_pca behavior vector does move in the intended direction: it improves
+correctness and reduces over-disclosure without increasing under-disclosure.
+However, the improvement is much smaller than the original mean-difference over
+vector.
+
+
+Conditional sweep
+-----------------
+Thresholds from -0.12 through -0.03 all gate every validation example:
+gate_true = 238/238
+
+For these thresholds, conditional steering is identical to unconditional
+steering:
+
+Correct:
+86/238 = 0.361
+
+Over-disclosure:
+37/238 = 0.155
+
+Under-disclosure:
+115/238 = 0.483
+
+At threshold -0.01:
+gate_true = 178/238
+Correct = 86/238 = 0.361
+Over = 37/238 = 0.155
+Under = 115/238 = 0.483
+
+At threshold 0.00:
+gate_true = 28/238
+Correct = 84/238 = 0.353
+Over = 39/238 = 0.164
+Under = 115/238 = 0.483
+
+Best val result by the existing selection rule:
+threshold = -0.12
+gate_true = 238/238
+Correct = 86/238 = 0.361
+Over = 37/238 = 0.155
+Under = 115/238 = 0.483
+
+
+Condition score distribution
+----------------------------
+All validation examples:
+min = -0.0179
+max = 0.0037
+mean = -0.0057
+median = -0.0049
+
+By true label:
+A: n = 97, mean = -0.0022, median = -0.0019
+B: n = 47, mean = -0.0052, median = -0.0049
+C: n = 94, mean = -0.0098, median = -0.0104
+
+Interpretation:
+The condition vector does separate C from A/B in the expected direction, but the
+score range is very narrow. Because the existing sweep thresholds were inherited
+from the mean-difference experiment, most thresholds are too low for this new
+score scale and therefore turn the gate on for every example.
+
+
+Comparison with original mean-difference over result
+----------------------------------------------------
+Original full1200 over conditional steering on val:
+threshold = -0.03
+gate_true = 147/238
+Correct = 94/238 = 0.395
+Over = 22/238 = 0.092
+Under = 122/238 = 0.513
+
+Current fisher_pca over best on val:
+threshold = -0.12
+gate_true = 238/238
+Correct = 86/238 = 0.361
+Over = 37/238 = 0.155
+Under = 115/238 = 0.483
+
+Difference from original mean-difference conditional:
+Correct: -8
+Over-disclosure: +15
+Under-disclosure: -7
+
+
+Conclusion
+----------
+The fisher_pca over vectors are directionally useful but weaker than the
+original mean-difference over vectors.
+
+They improve over the base model:
+Correct +3
+Over-disclosure -3
+
+But they do not match the original over-disclosure steering result:
+Correct 86 vs 94
+Over 37 vs 22
+
+For reporting, this should be treated as a negative or exploratory result rather
+than the main method.
+
+
+Recommended next checks
+-----------------------
+1. Reuse the cached activations to generate alternative vector methods:
+   - ensemble
+   - pca_residual
+   - pca_projected
+
+2. Use a tighter threshold sweep around the actual fisher_pca score scale:
+   -0.020, -0.0175, -0.015, -0.0125, -0.010, -0.0075,
+   -0.005, -0.0025, 0.000, 0.0025, 0.005
+
+3. Do not run test for this exact fisher_pca over setting unless needed for a
+   completeness table. The val result is already clearly worse than the
+   original mean-difference over result.
+
+
+Test result
+-----------
+Test was run for completeness.
+
+Files:
+outputs/04_low_rank_discriminant_vectors/02_over/test/condition_scores_test_layer32.csv
+outputs/04_low_rank_discriminant_vectors/02_over/test/steered_qwen_vl_test_layer32_alpha0.5.csv
+outputs/04_low_rank_discriminant_vectors/02_over/test/conditional_sweep_test_layer32_alpha0.5.csv
+
+Base test:
+Correct = 87/243 = 0.358
+Over = 44/243 = 0.181
+Under = 112/243 = 0.461
+
+Unconditional fisher_pca over steering on test:
+Correct = 87/243 = 0.358
+Over = 44/243 = 0.181
+Under = 112/243 = 0.461
+
+Best conditional fisher_pca over test:
+threshold = -0.12
+gate_true = 243/243
+Correct = 87/243 = 0.358
+Over = 44/243 = 0.181
+Under = 112/243 = 0.461
+
+Test conclusion:
+The fisher_pca over vector does not improve the test set. Its validation gain
+does not transfer to test. This reinforces the conclusion that the original
+mean-difference over vector is stronger for over-disclosure correction.

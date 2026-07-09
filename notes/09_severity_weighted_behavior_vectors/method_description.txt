@@ -1,0 +1,79 @@
+Method description
+==================
+
+Experiment name
+---------------
+severity_weighted_behavior_vectors
+
+Short name
+----------
+09 severity weighted mean
+
+
+Main idea
+---------
+This method keeps the original 02 mean-difference behavior vector idea, but
+weights training examples by disclosure severity.
+
+The A/B/C labels have an ordered granularity:
+
+A = 0
+B = 1
+C = 2
+
+For an error case, severity is:
+
+weight = abs(rank(pred_label) - rank(true_label))
+
+
+Examples
+--------
+Over-disclosure:
+
+A_to_B weight = 1
+A_to_C weight = 2
+B_to_C weight = 1
+
+Under-disclosure:
+
+B_to_A weight = 1
+C_to_B weight = 1
+C_to_A weight = 2
+
+
+What changes
+------------
+Changed:
+behavior vector extraction
+
+Not changed:
+condition vector
+condition score
+gate formula
+inference script
+
+Condition scores are reused from 02_formal_full1200.
+
+
+Default selected method
+-----------------------
+severity_weighted
+
+severity_beta = 1.0
+
+In the shared extractor this gives:
+
+weight = 1 + beta * (rank_distance - 1)
+       = rank_distance
+
+
+Why this may help
+-----------------
+The original mean vector is strong, so this method preserves the same basic
+mean-difference structure.
+
+Unlike case-balanced weighting, severity weighting does not give extremely rare
+case types equal total mass. It only gives more serious errors a modest larger
+weight.
+
+

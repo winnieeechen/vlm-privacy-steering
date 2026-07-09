@@ -1,0 +1,37 @@
+08 over progress notes
+======================
+
+Purpose
+-------
+Use weighted mean behavior vector with the original 02 over condition gate.
+
+
+Commands
+--------
+Extract vector:
+
+python scripts/08_weighted_mean_behavior_vectors/02_over/01_extract_over_behavior_vectors.py --selected-method interp_case_balanced_lam0.5
+
+Run val steering:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/08_weighted_mean_behavior_vectors/02_over/02_run_over_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+Run val quantile conditional sweep:
+
+python scripts/08_weighted_mean_behavior_vectors/02_over/03_sweep_over_conditional_val.py --layer 32 --alpha 0.5 --threshold-mode quantile --min-gate-rate 0.2 --max-gate-rate 0.8
+
+Run test steering after val selection:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/08_weighted_mean_behavior_vectors/02_over/02_run_over_behavior_steering.py --split test --layer 32 --alpha 0.5
+
+Apply selected threshold on test:
+
+python scripts/08_weighted_mean_behavior_vectors/02_over/04_apply_over_conditional_test.py --layer 32 --alpha 0.5 --threshold SELECTED_VAL_THRESHOLD
+
+
+Comparison target
+-----------------
+02 mean over conditional val:
+Correct 94/238
+Over 22/238
+Under 122/238

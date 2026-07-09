@@ -1,0 +1,70 @@
+Method description
+==================
+
+Experiment name:
+06_target_aware_probe_guided_steering
+
+Short name:
+granularity_probe_controller
+
+Core idea:
+Do not change the behavior vectors first. Change the routing/gating rule.
+
+The existing conditional methods use binary condition gates to decide whether
+to enable over or under steering. This is not directly aligned with the final
+A/B/C correctness metric.
+
+This method trains a lightweight supervised granularity probe:
+
+input:
+final prompt-token hidden state at layer l
+
+label:
+true_label in {A, B, C}
+
+probe output:
+y_probe in {A, B, C}
+conf_probe = max class probability
+
+Granularity rank:
+rank(A) = 0
+rank(B) = 1
+rank(C) = 2
+
+Controller:
+g_over(x)  = 1[ conf_probe(x) >= tau and rank(y_base) > rank(y_probe) ]
+g_under(x) = 1[ conf_probe(x) >= tau and rank(y_base) < rank(y_probe) ]
+
+Steering formula:
+h'_{l,t} = h_{l,t}
+         + g_over(x)  * alpha_over  * v_privacy,l
+         + g_under(x) * alpha_under * v_utility,l
+
+Decision rule:
+If probe confidence < tau:
+use base output.
+
+If base_pred is more specific than probe_pred:
+use over steering.
+
+If base_pred is more conservative than probe_pred:
+use under steering.
+
+If base_pred equals probe_pred:
+use base output.
+
+Why this may help:
+The gate is target-aware. It only intervenes when the base model's current
+granularity differs from the probe-predicted target granularity. This should
+avoid unnecessary over/under vector usage on already-correct samples.
+
+Validation rule:
+Train the probe only on train.
+Choose tau, layer, alpha_over, alpha_under on val.
+Evaluate the fixed setting on test.
+
+Implementation note:
+The first implementation uses cached controller selection. It reads existing
+base, over-steered, and under-steered CSVs, then uses the probe gate to choose
+which row-level result to keep. This is equivalent to running the same chosen
+steering action, but makes tau sweeps cheap.

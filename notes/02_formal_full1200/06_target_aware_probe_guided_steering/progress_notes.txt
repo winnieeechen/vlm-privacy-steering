@@ -1,0 +1,70 @@
+Granularity probe controller runbook
+====================================
+
+Status:
+created scripts, notes, and output folders.
+train and val hidden caches are available.
+granularity probe trained.
+val tau sweep completed for layer 32, alpha_over 0.5, alpha_under 0.5.
+
+Scripts:
+scripts/02_formal_full1200/06_target_aware_probe_guided_steering/01_extract_probe_hidden_states.py
+scripts/02_formal_full1200/06_target_aware_probe_guided_steering/02_train_granularity_probe.py
+scripts/02_formal_full1200/06_target_aware_probe_guided_steering/03_run_probe_controller.py
+scripts/02_formal_full1200/06_target_aware_probe_guided_steering/04_sweep_probe_controller_val.py
+
+Outputs:
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/cache/
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/probe/
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/val/
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/test/
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/logs/
+
+Step 1: extract hidden states
+CUDA_VISIBLE_DEVICES=7 python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/01_extract_probe_hidden_states.py --split train --layer 32
+CUDA_VISIBLE_DEVICES=7 python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/01_extract_probe_hidden_states.py --split val --layer 32
+CUDA_VISIBLE_DEVICES=7 python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/01_extract_probe_hidden_states.py --split test --layer 32
+
+Step 2: train granularity probe
+python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/02_train_granularity_probe.py --layer 32
+
+Step 3: run val tau sweep
+python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/04_sweep_probe_controller_val.py --layer 32 --alpha-over 0.5 --alpha-under 0.5
+
+Val summary output:
+outputs/02_formal_full1200/06_target_aware_probe_guided_steering/val/probe_controller_val_sweep_layer32_alpha0.5.csv
+
+Step 4: choose tau on val
+Pick the tau with the best correct / over / under tradeoff.
+Do not use test for tau selection.
+
+Step 5: run fixed test setting
+Example:
+python scripts/02_formal_full1200/06_target_aware_probe_guided_steering/03_run_probe_controller.py --split test --layer 32 --tau 0.50 --alpha-over 0.5 --alpha-under 0.5
+
+Important:
+This first implementation uses cached base / over-steered / under-steered CSVs:
+outputs/02_formal_full1200/00_base/
+outputs/02_formal_full1200/02_over/
+outputs/02_formal_full1200/03_under/
+
+So after hidden-state extraction, probe training and tau sweep are cheap.
+
+Current val results:
+base val = correct 83 / over 40 / under 115
+
+probe controller val sweep:
+tau 0.00 = correct 93 / over 29 / under 116 / actions base-over-under 95-39-104
+tau 0.20 = correct 93 / over 29 / under 116 / actions base-over-under 95-39-104
+tau 0.30 = correct 93 / over 29 / under 116 / actions base-over-under 95-39-104
+tau 0.40 = correct 93 / over 29 / under 116 / actions base-over-under 95-39-104
+tau 0.50 = correct 93 / over 29 / under 116 / actions base-over-under 98-39-101
+tau 0.60 = correct 92 / over 30 / under 116 / actions base-over-under 107-37-94
+tau 0.70 = correct 93 / over 30 / under 115 / actions base-over-under 120-33-85
+tau 0.80 = correct 93 / over 30 / under 115 / actions base-over-under 133-30-75
+tau 0.90 = correct 91 / over 32 / under 115 / actions base-over-under 147-23-68
+
+Interpretation:
+The target-aware gate improves correct and reduces over-disclosure.
+It does not meaningfully reduce under-disclosure with the existing alpha 0.5 cached under steering.
+For a fixed test run, tau 0.50 is a reasonable default because it ties the best correct count while slightly filtering low-confidence actions.

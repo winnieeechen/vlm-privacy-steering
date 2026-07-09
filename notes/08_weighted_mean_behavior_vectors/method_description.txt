@@ -1,0 +1,92 @@
+Method description
+==================
+
+Experiment name
+---------------
+weighted_mean_behavior_vectors
+
+Short name
+----------
+08 weighted mean
+
+
+Main idea
+---------
+Methods 03-07 mostly changed the vector extraction direction too aggressively,
+and none beat the original 02 mean-difference behavior vector.
+
+This method keeps the original mean-difference direction as the anchor, but
+adds controlled weighting to the training examples before computing the behavior
+vector.
+
+The condition gate is not changed.
+
+
+What changes
+------------
+Changed:
+behavior vector extraction
+
+Not changed:
+condition vector
+condition score
+gate formula
+inference script
+
+Condition scores are reused from:
+
+outputs/02_formal_full1200/02_over
+outputs/02_formal_full1200/03_under
+
+
+Vector variants
+---------------
+mean_diff:
+ordinary positive mean minus negative mean.
+
+case_balanced:
+each case_type contributes equal total weight within its positive/negative side.
+
+severity_weighted:
+sample weight = 1 + beta * (rank_distance - 1)
+
+case_balanced_severity:
+case-balanced weights multiplied by severity weight.
+
+interp_*:
+unit-vector interpolation between mean_diff and a weighted variant, rescaled to
+the original mean_diff layer norm.
+
+
+Default selected method
+-----------------------
+interp_case_balanced_lam0.5
+
+Formula:
+
+v_final = normalize(0.5 * unit(v_mean)
+                    + 0.5 * unit(v_case_balanced))
+          * norm(v_mean)
+
+
+Why this may help
+-----------------
+The original mean vector is strong, so we should not discard it.
+
+Case-balanced weighting can reduce dominance by very frequent case types.
+Interpolation keeps the vector close to the proven mean-difference direction.
+
+
+Main comparison target
+----------------------
+02_formal_full1200 mean over conditional:
+
+Val:
+Correct 94/238
+Over 22/238
+Under 122/238
+
+Test:
+Correct 95/243
+Over 30/243
+Under 118/243

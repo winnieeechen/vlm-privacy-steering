@@ -1,0 +1,42 @@
+CATS-PCA runbook
+================
+
+Status:
+scaffolded scripts, notes, and output folders.
+
+Scripts:
+scripts/06_cats_pca_behavior_vectors/00_common/cats_pca_behavior_extraction.py
+scripts/06_cats_pca_behavior_vectors/02_over/01_extract_over_behavior_vectors.py
+scripts/06_cats_pca_behavior_vectors/02_over/02_run_over_behavior_steering.py
+scripts/06_cats_pca_behavior_vectors/03_under/01_extract_under_behavior_vectors.py
+scripts/06_cats_pca_behavior_vectors/03_under/02_run_under_behavior_steering.py
+scripts/06_cats_pca_behavior_vectors/05_dual_additive/03_run_dual_additive_steering.py
+
+Outputs:
+outputs/06_cats_pca_behavior_vectors/02_over/
+outputs/06_cats_pca_behavior_vectors/03_under/
+outputs/06_cats_pca_behavior_vectors/05_dual_additive/
+
+Step 1: extract over behavior vector
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/02_over/01_extract_over_behavior_vectors.py
+
+Step 2: extract under behavior vector
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/03_under/01_extract_under_behavior_vectors.py
+
+Step 3: run over-only steering on val
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/02_over/02_run_over_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+Step 4: run under-only steering on val
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+Step 5: run dual-additive on val with original gates
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/05_dual_additive/03_run_dual_additive_steering.py --split val --layer 32 --alpha-over 0.5 --alpha-under 0.5 --over-threshold -0.03 --under-threshold 0.04
+
+If val looks useful, repeat steps 3-5 with --split test.
+
+Notes:
+This method only changes behavior vectors.
+It reuses the original condition scores from outputs/02_formal_full1200.
+The suffix hidden-state extraction is the expensive step.
+The first extraction writes cache files under outputs/06_cats_pca_behavior_vectors/*/cache.
+Reruns reuse those caches unless --refresh-cache is set.

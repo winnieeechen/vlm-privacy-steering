@@ -1,0 +1,48 @@
+Low-rank discriminant vectors: 05_dual_additive notes
+
+Purpose
+-------
+Run true combined activation steering with both low-rank discriminant behavior
+vectors in the same forward pass:
+
+h' = h
+   + g_over  * alpha_over  * v_over
+   + g_under * alpha_under * v_under
+
+This differs from 04_combined_router, which only routes among cached base,
+over-steered, and under-steered outputs.
+
+
+Script
+------
+scripts/04_low_rank_discriminant_vectors/05_dual_additive/03_run_dual_additive_steering.py
+
+
+Default setting
+---------------
+layer = 32
+alpha_over = 0.5
+alpha_under = 0.5
+over_threshold = -0.12
+under_threshold = -0.08
+
+These thresholds come from the current fisher_pca validation sweeps.
+
+
+Run commands
+------------
+Validation:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/04_low_rank_discriminant_vectors/05_dual_additive/03_run_dual_additive_steering.py \
+  --split val
+
+Test:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/04_low_rank_discriminant_vectors/05_dual_additive/03_run_dual_additive_steering.py \
+  --split test
+
+
+Outputs
+-------
+outputs/04_low_rank_discriminant_vectors/05_dual_additive/val/
+outputs/04_low_rank_discriminant_vectors/05_dual_additive/test/

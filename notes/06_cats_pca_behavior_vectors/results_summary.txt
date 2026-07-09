@@ -1,0 +1,99 @@
+Results summary
+===============
+
+Status
+------
+Only val results are available for this method.
+
+Baseline val
+------------
+Correct 83/238 = 0.349
+Over 40/238 = 0.168
+Under 115/238 = 0.483
+
+
+Over steering sweep
+-------------------
+Layer 32, alpha 0.25:
+Correct 88/238 = 0.370
+Over 36/238 = 0.151
+Under 114/238 = 0.479
+
+Layer 32, alpha 0.5:
+Correct 88/238 = 0.370
+Over 35/238 = 0.147
+Under 115/238 = 0.483
+
+Layer 32, alpha 0.75:
+Correct 84/238 = 0.353
+Over 37/238 = 0.155
+Under 117/238 = 0.492
+
+Layer 32, alpha 1.0:
+Correct 84/238 = 0.353
+Over 37/238 = 0.155
+Under 117/238 = 0.492
+
+Best over-only val point:
+alpha = 0.5 if prioritizing lower over
+Correct 88/238
+Over 35/238
+Under 115/238
+
+
+Over conditional sweep
+----------------------
+Using 02_formal_full1200 over condition score.
+
+Layer 32, alpha 0.5, best val point:
+threshold = -0.12
+gate_true = 231/238
+Correct 87/238 = 0.366
+Over 35/238 = 0.147
+Under 116/238 = 0.487
+
+
+Under steering
+--------------
+Layer 32, alpha 0.5:
+Correct 86/238 = 0.361
+Over 37/238 = 0.155
+Under 115/238 = 0.483
+
+Layer 32, alpha 1.0:
+Correct 84/238 = 0.353
+Over 38/238 = 0.160
+Under 116/238 = 0.487
+
+
+Dual-additive
+-------------
+Layer 32, alpha_over 0.5, alpha_under 0.5:
+Correct 86/238 = 0.361
+Over 35/238 = 0.147
+Under 117/238 = 0.492
+
+Layer 32, alpha_over 1.0, alpha_under 1.0:
+Correct 85/238 = 0.357
+Over 37/238 = 0.155
+Under 116/238 = 0.487
+
+
+Comparison to mean baseline
+---------------------------
+02_formal_full1200 mean over conditional val:
+Correct 94/238
+Over 22/238
+Under 122/238
+
+06 CATS-PCA improves over the base model, especially over-only alpha 0.5, but
+it does not beat the mean baseline. The conditional gate also does not rescue
+the method; conditional CATS-PCA is slightly worse than unconditional CATS-PCA
+on correct.
+
+
+Conclusion
+----------
+CATS-PCA has a real positive signal, but it is not strong enough to replace the
+mean behavior vector. The answer-suffix transition idea is interesting, but PCA
+PC1 is probably not the right aggregation direction for this task.

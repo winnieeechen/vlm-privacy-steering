@@ -1,0 +1,156 @@
+Qwen2.5-VL-7B-Instruct full1200 run instructions
+
+Model:
+Qwen/Qwen2.5-VL-7B-Instruct
+
+Scripts:
+scripts/03_other_vlms/qwen25_vl_7b_instruct
+
+Outputs:
+outputs/03_other_vlms/qwen25_vl_7b_instruct
+
+Dataset:
+data/02_full1200/processed_original_logic
+
+Split sizes:
+train: 717
+val: 238
+test: 243
+
+Assumption:
+This follows the same original-logic full1200 pipeline used by
+02_formal_full1200 and mirrored under
+03_other_vlms/llama32_11b_vision.
+
+============================================================
+0. Environment
+============================================================
+
+Run commands from the repo root:
+
+cd /home/wc221/vlm-privacy-steering
+
+The scripts require transformers with Qwen2.5-VL support and qwen-vl-utils.
+Use CUDA_VISIBLE_DEVICES to choose the GPU.
+
+============================================================
+1. Base inference
+============================================================
+
+Train:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/01_base/01_run_qwen25_vl_7b_base.py \
+  --input-csv data/02_full1200/processed_original_logic/geoprivacy_downloaded_train.csv \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/train/base_qwen25_vl_7b_train_717.csv \
+  --resume
+
+Val:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/01_base/01_run_qwen25_vl_7b_base.py \
+  --input-csv data/02_full1200/processed_original_logic/geoprivacy_downloaded_val.csv \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv \
+  --resume
+
+Test:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/01_base/01_run_qwen25_vl_7b_base.py \
+  --input-csv data/02_full1200/processed_original_logic/geoprivacy_downloaded_test.csv \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/test/base_qwen25_vl_7b_test_243.csv \
+  --resume
+
+============================================================
+2. Over-disclosure pipeline
+============================================================
+
+Build train vector tables:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/09_build_vector_training_tables.py
+
+Extract vectors:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/11_extract_condition_vectors.py
+
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/12_extract_behavior_vectors.py
+
+Score val condition signal:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/13_score_condition_signal.py \
+  --base-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv \
+  --condition-vector outputs/03_other_vlms/qwen25_vl_7b_instruct/02_over/vectors/condition_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/02_over/val/condition_scores_val_layer32.csv \
+  --layer 32
+
+Run over behavior steering on val:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/14_run_behavior_steering.py \
+  --base-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv \
+  --behavior-vector outputs/03_other_vlms/qwen25_vl_7b_instruct/02_over/vectors/behavior_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/02_over/val/steered_qwen25_vl_7b_val_layer32_alpha0.5.csv \
+  --layer 32 \
+  --alpha 0.5
+
+Sweep over conditional routing on val:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/15_sweep_conditional_val.py
+
+After choosing layer/alpha/threshold from val, run the same score and steering
+commands on test, then apply:
+
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/02_over/16_final_conditional_test.py \
+  --threshold <OVER_THRESHOLD>
+
+============================================================
+3. Under-disclosure pipeline
+============================================================
+
+Build train vector tables:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/09_build_under_vector_training_tables.py
+
+Extract vectors:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/11_extract_under_condition_vectors.py
+
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/12_extract_under_behavior_vectors.py
+
+Score val condition signal:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/13_score_under_condition_signal.py \
+  --base-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv \
+  --under-condition-vector outputs/03_other_vlms/qwen25_vl_7b_instruct/03_under/vectors/under_condition_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/03_under/val/under_condition_scores_val_layer32.csv \
+  --layer 32
+
+Run under behavior steering on val:
+CUDA_VISIBLE_DEVICES=0 python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/14_run_under_steering.py \
+  --base-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv \
+  --under-vector outputs/03_other_vlms/qwen25_vl_7b_instruct/03_under/vectors/under_behavior_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/03_under/val/under_steered_qwen25_vl_7b_val_layer32_alpha0.5.csv \
+  --layer 32 \
+  --alpha 0.5
+
+Sweep under conditional routing on val:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/15_sweep_under_conditional_val.py
+
+After choosing layer/alpha/threshold from val, run the same score and steering
+commands on test, then apply:
+
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/03_under/16_final_under_conditional_test.py \
+  --threshold <UNDER_THRESHOLD>
+
+============================================================
+4. Combined cached router
+============================================================
+
+Run this only after base, over scores, over steered outputs, under scores,
+and under steered outputs exist for the split.
+
+Val example:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/04_combined_router/01_cached_combined_routing.py \
+  --split val \
+  --over-layer 32 \
+  --over-alpha 0.5 \
+  --under-layer 32 \
+  --under-alpha 0.5 \
+  --over-threshold -0.03 \
+  --under-threshold 0.04
+
+Test example:
+python scripts/03_other_vlms/qwen25_vl_7b_instruct/04_combined_router/01_cached_combined_routing.py \
+  --split test \
+  --over-layer <OVER_LAYER> \
+  --over-alpha <OVER_ALPHA> \
+  --under-layer <UNDER_LAYER> \
+  --under-alpha <UNDER_ALPHA> \
+  --over-threshold <OVER_THRESHOLD> \
+  --under-threshold <UNDER_THRESHOLD>
+

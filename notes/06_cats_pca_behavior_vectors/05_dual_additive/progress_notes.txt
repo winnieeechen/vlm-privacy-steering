@@ -1,0 +1,11 @@
+05_dual_additive CATS-PCA
+=========================
+
+This keeps original condition scores and gates, but replaces behavior vectors
+with CATS-PCA vectors.
+
+Run val:
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/05_dual_additive/03_run_dual_additive_steering.py --split val --layer 32 --alpha-over 0.5 --alpha-under 0.5 --over-threshold -0.03 --under-threshold 0.04
+
+Run test after val selection:
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/05_dual_additive/03_run_dual_additive_steering.py --split test --layer 32 --alpha-over 0.5 --alpha-under 0.5 --over-threshold -0.03 --under-threshold 0.04

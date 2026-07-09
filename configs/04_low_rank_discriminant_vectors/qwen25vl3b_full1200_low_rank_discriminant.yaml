@@ -1,0 +1,44 @@
+experiment:
+  name: qwen25vl3b_full1200_low_rank_discriminant_vectors
+  stage: low_rank_discriminant_vectors
+  method: pca_fisher_vector_extraction
+  publish: false
+  description: "PCA/Fisher alternatives for both condition and behavior vectors in over and under steering."
+
+model:
+  name: Qwen/Qwen2.5-VL-3B-Instruct
+  short_name: qwen25vl3b
+
+outputs:
+  root_dir: outputs/04_low_rank_discriminant_vectors
+  over_vectors_dir: outputs/04_low_rank_discriminant_vectors/02_over/vectors
+  under_vectors_dir: outputs/04_low_rank_discriminant_vectors/03_under/vectors
+
+vector_methods:
+  selected: fisher_pca
+  available:
+    - mean_diff
+    - pca_projected
+    - pca_residual
+    - fisher_pca
+    - ensemble
+  pca_rank: 64
+  residual_rank: 8
+  fisher_rank: 64
+  ridge: 0.05
+
+over:
+  condition_csv: outputs/04_low_rank_discriminant_vectors/02_over/vector_cases/condition_vector_cases_train_717.csv
+  behavior_csv: outputs/04_low_rank_discriminant_vectors/02_over/vector_cases/behavior_vector_cases_train_717.csv
+  condition_vector: outputs/04_low_rank_discriminant_vectors/02_over/vectors/condition_vectors_full1200.pt
+  behavior_vector: outputs/04_low_rank_discriminant_vectors/02_over/vectors/behavior_vectors_full1200.pt
+
+under:
+  condition_csv: outputs/04_low_rank_discriminant_vectors/03_under/vector_cases/under_condition_vector_cases_train_717.csv
+  behavior_csv: outputs/04_low_rank_discriminant_vectors/03_under/vector_cases/under_behavior_vector_cases_train_717.csv
+  condition_vector: outputs/04_low_rank_discriminant_vectors/03_under/vectors/under_condition_vectors_full1200.pt
+  behavior_vector: outputs/04_low_rank_discriminant_vectors/03_under/vectors/under_behavior_vectors_full1200.pt
+
+recommended_first_sweep:
+  layers: [24, 28, 32, 36]
+  alphas: [0.25, 0.5, 0.75, 1.0]

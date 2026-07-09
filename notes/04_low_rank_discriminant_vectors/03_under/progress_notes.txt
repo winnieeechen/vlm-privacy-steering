@@ -1,0 +1,255 @@
+Low-rank discriminant vectors: 03_under validation notes
+
+Experiment
+----------
+Method family:
+low_rank_discriminant_vectors
+
+Selected vector method:
+fisher_pca
+
+Vector type:
+1. under_condition_vector
+2. under_behavior_vector
+
+Goal:
+Reduce under-disclosure using the same high-level logic as the original
+full1200 under-disclosure experiment, but replace the raw mean-difference
+vectors with low-rank Fisher/PCA vectors.
+
+
+Setting
+-------
+Dataset:
+val n = 238
+
+Layer:
+32
+
+Alpha:
+0.5
+
+Under condition score:
+cosine similarity between the layer-32 hidden state and the selected
+under_condition_vector_unit.
+
+
+Base result
+-----------
+Correct:
+83/238 = 0.349
+
+Over-disclosure:
+40/238 = 0.168
+
+Under-disclosure:
+115/238 = 0.483
+
+Case counts:
+A_to_A = 57
+A_to_B = 40
+B_to_A = 21
+B_to_B = 26
+C_to_A = 16
+C_to_B = 78
+
+
+Unconditional fisher_pca under steering
+---------------------------------------
+Correct:
+87/238 = 0.366
+
+Over-disclosure:
+37/238 = 0.155
+
+Under-disclosure:
+114/238 = 0.479
+
+Change from base:
+Correct: +4
+Over-disclosure: -3
+Under-disclosure: -1
+
+Interpretation:
+This is unexpectedly cleaner than the original mean-difference under vector on
+validation. It improves correctness, reduces under-disclosure slightly, and also
+reduces over-disclosure instead of increasing it.
+
+
+Conditional under sweep
+-----------------------
+Thresholds -0.08 through -0.04 gate every validation example:
+gate_true = 238/238
+
+For these thresholds, conditional under steering is identical to unconditional
+under steering:
+
+Correct:
+87/238 = 0.366
+
+Over-disclosure:
+37/238 = 0.155
+
+Under-disclosure:
+114/238 = 0.479
+
+At threshold -0.01:
+gate_true = 236/238
+Correct = 87/238 = 0.366
+Over = 37/238 = 0.155
+Under = 114/238 = 0.479
+
+At threshold 0.00:
+gate_true = 134/238
+Correct = 84/238 = 0.353
+Over = 40/238 = 0.168
+Under = 114/238 = 0.479
+
+At threshold 0.01:
+gate_true = 11/238
+Correct = 83/238 = 0.349
+Over = 40/238 = 0.168
+Under = 115/238 = 0.483
+
+Thresholds 0.02 and above gate no examples and therefore recover the base model.
+
+Best val result by the existing selection rule:
+threshold = -0.08
+gate_true = 238/238
+Correct = 87/238 = 0.366
+Over = 37/238 = 0.155
+Under = 114/238 = 0.479
+
+
+Under condition score distribution
+----------------------------------
+All validation examples:
+min = -0.0100
+max = 0.0114
+mean = 0.0012
+median = 0.0009
+
+By true label:
+A: n = 97, mean = -0.0028, median = -0.0031
+B: n = 47, mean = 0.0014, median = 0.0018
+C: n = 94, mean = 0.0052, median = 0.0062
+
+Interpretation:
+The under condition vector separates A from B/C in the expected direction, but
+the score range is narrow. The inherited threshold grid is therefore too coarse:
+many thresholds either gate everything or gate almost nothing.
+
+
+Comparison with original mean-difference under result
+-----------------------------------------------------
+Original full1200 under unconditional steering on val:
+Correct = 85/238 = 0.357
+Over = 42/238 = 0.176
+Under = 111/238 = 0.466
+
+Original full1200 under safe conditional setting on val:
+threshold = 0.04
+Correct = 84/238 = 0.353
+Over = 40/238 = 0.168
+Under = 114/238 = 0.479
+
+Current fisher_pca under best on val:
+threshold = -0.08
+gate_true = 238/238
+Correct = 87/238 = 0.366
+Over = 37/238 = 0.155
+Under = 114/238 = 0.479
+
+Difference from original safe conditional:
+Correct: +3
+Over-disclosure: -3
+Under-disclosure: 0
+
+Difference from original unconditional under:
+Correct: +2
+Over-disclosure: -5
+Under-disclosure: +3
+
+
+Conclusion
+----------
+The fisher_pca under result is promising on validation.
+
+Compared with the base model:
+Correct +4
+Over-disclosure -3
+Under-disclosure -1
+
+Compared with the original safe under conditional setting:
+Correct +3
+Over-disclosure -3
+Under-disclosure unchanged
+
+This is the stronger of the two low-rank discriminant results so far. Unlike the
+over fisher_pca setting, it may be worth carrying to test.
+
+
+Recommended next checks
+-----------------------
+1. Run test for the current fisher_pca under setting, using the validation-best
+   behavior. Since the best val threshold gates every example, the most relevant
+   first test is unconditional under steering.
+
+2. Run a tighter threshold sweep around the actual under score scale:
+   -0.0125, -0.010, -0.0075, -0.005, -0.0025, 0.000,
+    0.0025, 0.005, 0.0075, 0.010, 0.0125
+
+3. Reuse the cached activations to test ensemble and pca_residual variants.
+
+
+Test result
+-----------
+Files:
+outputs/04_low_rank_discriminant_vectors/03_under/test/under_condition_scores_test_layer32.csv
+outputs/04_low_rank_discriminant_vectors/03_under/test/under_steered_qwen_vl_test_layer32_alpha0.5.csv
+outputs/04_low_rank_discriminant_vectors/03_under/test/under_conditional_sweep_test_layer32_alpha0.5.csv
+
+Base test:
+Correct = 87/243 = 0.358
+Over = 44/243 = 0.181
+Under = 112/243 = 0.461
+
+Unconditional fisher_pca under steering on test:
+Correct = 87/243 = 0.358
+Over = 45/243 = 0.185
+Under = 111/243 = 0.457
+
+Change from base:
+Correct: 0
+Over-disclosure: +1
+Under-disclosure: -1
+
+Best conditional fisher_pca under test:
+threshold = 0.01
+gate_true = 15/243
+Correct = 88/243 = 0.362
+Over = 44/243 = 0.181
+Under = 111/243 = 0.457
+
+Change from base:
+Correct: +1
+Over-disclosure: 0
+Under-disclosure: -1
+
+Test conclusion:
+The fisher_pca under vector has a small but clean conditional test benefit at
+threshold 0.01. It improves correctness by one example and reduces
+under-disclosure by one example without increasing over-disclosure.
+
+Compared with the original safe under conditional test result:
+Original safe under conditional:
+Correct = 88/243 = 0.362
+Over = 44/243 = 0.181
+Under = 111/243 = 0.457
+
+Current fisher_pca under conditional:
+Correct = 88/243 = 0.362
+Over = 44/243 = 0.181
+Under = 111/243 = 0.457
+
+The final test metrics match the original safe under conditional result.

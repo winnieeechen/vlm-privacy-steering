@@ -1,0 +1,30 @@
+experiment:
+  name: qwen25vl3b_full1200_logit_gradient_vectors
+  stage: logit_gradient_vectors
+  method: logit_margin_gradient
+  publish: false
+  description: "Steering vectors from gradients of next-token A/B/C logit margins."
+
+model:
+  name: Qwen/Qwen2.5-VL-3B-Instruct
+  short_name: qwen25vl3b
+
+outputs:
+  root_dir: outputs/05_logit_gradient_vectors
+  over_vectors_dir: outputs/05_logit_gradient_vectors/02_over/vectors
+  under_vectors_dir: outputs/05_logit_gradient_vectors/03_under/vectors
+
+gradient_objective:
+  target_label: true_label
+  contrast_label: "base pred_label when wrong; otherwise side-specific risk label"
+  margin: "logit(target_label) - logit(contrast_label)"
+
+selection:
+  condition_vector: pos_minus_neg
+  behavior_vector: negative_mean
+
+recommended_order:
+  - 02_over
+  - 03_under
+  - 04_combined_router
+  - 05_dual_additive

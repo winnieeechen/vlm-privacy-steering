@@ -1,0 +1,8 @@
+Qwen2.5-VL-7B-Instruct under-disclosure steering notes
+
+Status:
+Scaffolded, not run yet.
+
+See:
+notes/03_other_vlms/qwen25_vl_7b_instruct/run_instructions.txt
+

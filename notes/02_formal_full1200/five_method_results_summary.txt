@@ -1,13 +1,14 @@
-Four-method results summary
+Five-method results summary
 Original-logic full1200 experiment
 Layer = 32
 
-This note summarizes four steering methods:
+This note summarizes five steering methods:
 
 1. Over-only conditional steering
 2. Under-only safe conditional steering
 3. Dual-router combined steering
 4. Dual-additive combined steering
+5. Target-aware probe-guided steering
 
 Base model is included as reference.
 
@@ -121,6 +122,53 @@ alpha_under = 0.5
 over threshold = -0.03
 under threshold = 0.04
 
+------------------------------------------------------------
+5. Target-aware probe-guided steering
+------------------------------------------------------------
+
+Short name:
+granularity_probe_controller
+
+Goal:
+Make routing/gating directly target-aware for A/B/C disclosure granularity.
+
+Probe:
+Train a lightweight multinomial logistic regression probe on train hidden states.
+
+Input:
+final prompt-token hidden state at layer 32
+
+Label:
+true_label in {A, B, C}
+
+Granularity rank:
+rank(A) = 0
+rank(B) = 1
+rank(C) = 2
+
+Gate:
+g_over(x) = 1[conf_probe(x) >= tau and rank(y_base) > rank(y_probe)]
+g_under(x) = 1[conf_probe(x) >= tau and rank(y_base) < rank(y_probe)]
+
+Cached controller rule:
+if g_over = 1:
+    use over-steered output
+elif g_under = 1:
+    use under-steered output
+else:
+    use base output
+
+Setting:
+layer = 32
+alpha_over = 0.5
+alpha_under = 0.5
+tau selected on val = 0.50
+
+Note:
+This method changes the routing/gating controller, not the behavior vectors.
+It uses the probe-predicted target granularity to avoid steering samples whose
+base output already matches the predicted target level.
+
 
 ============================================================
 Validation results
@@ -205,6 +253,43 @@ Under-disclosure: +7
 Note:
 Dual-additive is the true implementation of simultaneous combined steering.
 On val, it is slightly worse than dual-router over_first.
+
+------------------------------------------------------------
+5. Target-aware probe-guided steering, tau = 0.50
+------------------------------------------------------------
+Correct: 93/238 = 0.391
+Over-disclosure: 29/238 = 0.122
+Under-disclosure: 116/238 = 0.487
+
+Action counts:
+base = 98
+over = 39
+under = 101
+
+Change from base:
+Correct: +10
+Over-disclosure: -11
+Under-disclosure: +1
+
+Comparison with dual-additive on val:
+Dual-additive:
+Correct 93/238 = 0.391
+Over 23/238 = 0.097
+Under 122/238 = 0.513
+
+Target-aware probe-guided:
+Correct 93/238 = 0.391
+Over 29/238 = 0.122
+Under 116/238 = 0.487
+
+Difference:
+Correct: 0
+Over-disclosure: +6
+Under-disclosure: -6
+
+Note:
+On val, target-aware probe-guided steering ties dual-additive on correctness.
+It is less privacy-aggressive than dual-additive, but has a better under-disclosure trade-off.
 
 
 ============================================================
@@ -304,6 +389,44 @@ Correct: +1
 Over-disclosure: +1
 Under-disclosure: -2
 
+------------------------------------------------------------
+5. Target-aware probe-guided steering, tau = 0.50
+------------------------------------------------------------
+Correct: 96/243 = 0.395
+Over-disclosure: 35/243 = 0.144
+Under-disclosure: 112/243 = 0.461
+
+Action counts:
+base = 88
+over = 39
+under = 116
+
+Change from base:
+Correct: +9
+Over-disclosure: -9
+Under-disclosure: 0
+
+Comparison with dual-additive on test:
+Dual-additive:
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Target-aware probe-guided:
+Correct 96/243 = 0.395
+Over 35/243 = 0.144
+Under 112/243 = 0.461
+
+Difference:
+Correct: 0
+Over-disclosure: +4
+Under-disclosure: -4
+
+Note:
+On test, target-aware probe-guided steering ties dual-additive for best correctness.
+It preserves base-level under-disclosure, but gives up some over-disclosure reduction
+relative to dual-additive.
+
 
 ============================================================
 Main takeaways
@@ -335,6 +458,24 @@ Compared with dual-router over_first, dual-additive has:
 +1 over-disclosure
 
 Therefore, dual-additive is a promising balanced variant, while dual-router over_first remains the safer privacy-first variant.
+
+5. Target-aware probe-guided steering ties dual-additive on test correctness.
+It changes the controller rather than the vectors:
+the probe predicts target A/B/C granularity, and steering is applied only when
+base granularity differs from the probe target.
+
+On test, target-aware probe-guided steering:
+Correct 96/243 = 0.395
+Over 35/243 = 0.144
+Under 112/243 = 0.461
+
+Compared with dual-additive:
+Correct: same
+Over-disclosure: +4
+Under-disclosure: -4
+
+This means target-aware probe-guided steering is less privacy-aggressive, but
+better preserves utility by not increasing under-disclosure above the base model.
 
 
 ============================================================
@@ -368,5 +509,22 @@ Correct 96/243 = 0.395
 Over 31/243 = 0.128
 Under 116/243 = 0.477
 
-Possible paper wording:
-Dual-additive steering achieves the highest overall correctness and a better under-disclosure trade-off than dual-router, while still substantially reducing over-disclosure compared with the base model. Dual-router over_first is the more conservative privacy-first strategy because it achieves the lowest over-disclosure.
+Target-aware probe-guided:
+Correct 96/243 = 0.395
+Over 35/243 = 0.144
+Under 112/243 = 0.461
+
+
+
+
+
+C_to_B	    229
+A_to_A	    155
+A_to_B	    134
+B_to_B	    99
+C_to_A	    49
+B_to_A	    44
+C_to_C	    5
+A_to_C	    1
+B_to_C	    1
+total	    717

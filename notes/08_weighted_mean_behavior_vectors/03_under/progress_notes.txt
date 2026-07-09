@@ -1,0 +1,23 @@
+08 under progress notes
+=======================
+
+Purpose
+-------
+Use weighted mean under behavior vector with the original 02 under condition
+gate.
+
+
+Commands
+--------
+Extract vector:
+
+python scripts/08_weighted_mean_behavior_vectors/03_under/01_extract_under_behavior_vectors.py --selected-method interp_case_balanced_lam0.5
+
+Run val steering:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/08_weighted_mean_behavior_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+
+Recommended order
+-----------------
+Run under after over behavior is understood.

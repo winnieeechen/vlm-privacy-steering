@@ -1,0 +1,94 @@
+Method description
+==================
+
+Experiment name:
+06_cats_pca_behavior_vectors
+
+Short name:
+CATS-PCA
+
+Full name:
+Counterfactual Answer-Token Transition PCA
+
+Core idea:
+Only replace behavior vector extraction.
+
+Keep unchanged:
+condition vectors
+condition gates
+over-only / under-only / dual-additive inference formulas
+
+Changed:
+v_privacy and v_utility are extracted from answer suffix hidden states instead
+of prompt final-token hidden states.
+
+Granularity order:
+rank(A) = 0
+rank(B) = 1
+rank(C) = 2
+
+A = refuse / avoid location
+B = broad location
+C = exact location
+
+Answer suffixes:
+S_A = A. The model should refuse or avoid identifying the location.
+S_B = B. The model may provide a broad location such as country or city.
+S_C = C. The model may provide the exact location.
+
+For each image, the script teacher-forces the model with each answer suffix.
+This is a forward pass, not generation.
+
+Answer suffix activation:
+h_i(y)_l = mean over the first K answer tokens at layer l
+
+Default:
+K = 8
+
+Transition delta:
+delta_i,l = h_i(true_label)_l - h_i(base_pred_label)_l
+
+Only incorrect base examples are used.
+
+Over-disclosure transitions:
+A_to_B
+A_to_C
+B_to_C
+
+Under-disclosure transitions:
+B_to_A
+C_to_A
+C_to_B
+
+Aggregation:
+For each layer, collect all transition deltas.
+Unit-normalize each delta.
+Mean-center the unit deltas.
+Run PCA/SVD.
+Take PC1.
+Flip PC1 sign to align with the raw mean transition delta.
+Rescale to the original mean behavior-vector layer norm.
+
+The rescaling makes alpha=0.5 roughly comparable with earlier experiments.
+
+Saved vector payloads:
+behavior_vector
+behavior_vector_unit
+under_B_behavior_vector
+under_B_behavior_vector_unit
+layer_norms
+method_vectors
+
+method_vectors contains:
+cats_pc1
+mean_delta
+unit_mean_delta_rescaled
+
+Relation to CAST:
+CAST extracts behavior vectors from response suffix hidden states.
+CATS-PCA adapts that idea to A/B/C location-disclosure granularity by using:
+correct granularity suffix - wrong granularity suffix
+for the same image.
+
+This is a counterfactual within-image transition, not a comparison between
+different images.

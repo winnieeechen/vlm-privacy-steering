@@ -1,0 +1,112 @@
+Overall results summary
+=======================
+
+Comparison target:
+mean = original mean-difference vectors from 02_formal_full1200
+pca = low_rank_discriminant_vectors with selected method fisher_pca
+
+Layer = 32
+Alpha = 0.5
+
+
+Validation results
+------------------
+Dataset: val n = 238
+
+method                         correct       over          under
+Base                           83  0.349     40  0.168     115 0.483
+
+mean over conditional           94  0.395     22  0.092     122 0.513
+mean under safe conditional     84  0.353     40  0.168     114 0.479
+mean dual-router over_first     94  0.395     22  0.092     122 0.513
+mean dual-additive              93  0.391     23  0.097     122 0.513
+
+pca over conditional            86  0.361     37  0.155     115 0.483
+pca under conditional           87  0.366     37  0.155     114 0.479
+pca combined over_first         86  0.361     37  0.155     115 0.483
+pca combined under_first        87  0.366     37  0.155     114 0.479
+pca combined conflict_base      83  0.349     40  0.168     115 0.483
+pca dual-additive               84  0.353     39  0.164     115 0.483
+
+
+Test results
+------------
+Dataset: test n = 243
+
+method                         correct       over          under
+Base                           87  0.358     44  0.181     112 0.461
+
+mean over conditional           95  0.391     30  0.123     118 0.486
+mean under safe conditional     88  0.362     44  0.181     111 0.457
+mean dual-router over_first     95  0.391     30  0.123     118 0.486
+mean dual-additive              96  0.395     31  0.128     116 0.477
+
+pca over conditional            87  0.358     44  0.181     112 0.461
+pca under conditional           88  0.362     44  0.181     111 0.457
+pca combined over_first         87  0.358     44  0.181     112 0.461
+pca combined under_first        87  0.358     45  0.185     111 0.457
+pca combined conflict_base      87  0.358     44  0.181     112 0.461
+pca dual-additive               86  0.354     44  0.181     113 0.465
+
+
+Best test results by goal
+-------------------------
+Highest correct:
+mean dual-additive
+Correct 96/243 = 0.395
+Over 31/243 = 0.128
+Under 116/243 = 0.477
+
+Lowest over-disclosure:
+mean over conditional / mean dual-router over_first
+Correct 95/243 = 0.391
+Over 30/243 = 0.123
+Under 118/243 = 0.486
+
+Cleanest under-only utility recovery:
+mean under safe conditional and pca under conditional tie
+Correct 88/243 = 0.362
+Over 44/243 = 0.181
+Under 111/243 = 0.457
+
+
+Main comparison
+---------------
+Over-disclosure correction:
+mean is clearly better than pca.
+
+mean over conditional test:
+Correct 95, Over 30, Under 118
+
+pca over conditional test:
+Correct 87, Over 44, Under 112
+
+
+Under-disclosure correction:
+pca matches mean safe-under on test, but does not beat it.
+
+mean under safe conditional test:
+Correct 88, Over 44, Under 111
+
+pca under conditional test:
+Correct 88, Over 44, Under 111
+
+
+Combined methods:
+pca combined and pca dual-additive do not improve over the single-vector pca
+results. The pca gates mostly collapse to all-on/all-off behavior under the
+current threshold grid, so routing does not add much.
+
+
+Conclusion
+----------
+The low-rank discriminant / fisher_pca vectors are useful as an ablation, but
+they are not better than the original mean-difference vectors.
+
+For the main result, keep mean-difference vectors:
+1. mean over conditional for privacy-safety
+2. mean dual-additive for highest test correctness
+3. mean/pca under conditional tie for safe under-disclosure recovery
+
+For reporting, pca/fisher_pca is best described as an attempted refinement that
+did not improve the main over-disclosure result.

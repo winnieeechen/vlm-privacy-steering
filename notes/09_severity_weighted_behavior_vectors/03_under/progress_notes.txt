@@ -1,0 +1,23 @@
+09 under progress notes
+=======================
+
+Purpose
+-------
+Use severity-weighted under behavior vector with the original 02 under condition
+gate.
+
+
+Commands
+--------
+Extract vector:
+
+python scripts/09_severity_weighted_behavior_vectors/03_under/01_extract_under_behavior_vectors.py --selected-method severity_weighted --severity-beta 1.0
+
+Run val steering:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/09_severity_weighted_behavior_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+
+Recommended order
+-----------------
+Run under after over behavior is understood.

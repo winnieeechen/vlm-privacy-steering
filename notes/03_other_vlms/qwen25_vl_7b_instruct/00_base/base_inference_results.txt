@@ -1,0 +1,10 @@
+Qwen2.5-VL-7B-Instruct base inference notes
+
+Status:
+Not run yet.
+
+Expected outputs:
+outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/train/base_qwen25_vl_7b_train_717.csv
+outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv
+outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/test/base_qwen25_vl_7b_test_243.csv
+

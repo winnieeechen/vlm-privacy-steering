@@ -1,0 +1,11 @@
+03_under CATS-PCA
+=================
+
+Run:
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/03_under/01_extract_under_behavior_vectors.py
+
+Output vector:
+outputs/06_cats_pca_behavior_vectors/03_under/vectors/under_behavior_vectors_cats_pca_full1200.pt
+
+Run under steering on val:
+CUDA_VISIBLE_DEVICES=7 python scripts/06_cats_pca_behavior_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5

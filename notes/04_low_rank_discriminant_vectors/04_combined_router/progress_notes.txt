@@ -1,0 +1,65 @@
+Low-rank discriminant vectors: 04_combined_router notes
+
+Purpose
+-------
+Combine the cached over-steered and under-steered outputs from the
+low_rank_discriminant_vectors experiment.
+
+This is not a new forward pass. It routes among already-computed outputs:
+
+1. base output
+2. over-steered output
+3. under-steered output
+
+
+Script
+------
+scripts/04_low_rank_discriminant_vectors/04_combined_router/01_cached_combined_routing.py
+
+
+Default thresholds
+------------------
+over_threshold = -0.12
+under_threshold = -0.08
+
+These are the validation-best thresholds from the current fisher_pca sweeps.
+Both thresholds gate nearly/all examples, so the combined router will likely be
+dominated by conflict handling.
+
+
+Run commands
+------------
+Validation:
+
+python scripts/04_low_rank_discriminant_vectors/04_combined_router/01_cached_combined_routing.py \
+  --split val
+
+Test:
+
+python scripts/04_low_rank_discriminant_vectors/04_combined_router/01_cached_combined_routing.py \
+  --split test
+
+
+Outputs
+-------
+outputs/04_low_rank_discriminant_vectors/04_combined_router/val/
+outputs/04_low_rank_discriminant_vectors/04_combined_router/test/
+
+
+Strategies
+----------
+over_first:
+Use over output when the over gate is true. If over gate is false but under gate
+is true, use under output. Otherwise use base.
+
+under_first:
+Use under output when the under gate is true. If under gate is false but over
+gate is true, use over output. Otherwise use base.
+
+conflict_base:
+Use over or under only when exactly one gate is true. If both gates are true,
+fall back to base.
+
+conflict_score_margin:
+When both gates are true, compare each score's margin over its threshold and use
+the larger-margin action.

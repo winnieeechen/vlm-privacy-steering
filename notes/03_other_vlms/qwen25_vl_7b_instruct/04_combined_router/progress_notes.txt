@@ -1,0 +1,8 @@
+Qwen2.5-VL-7B-Instruct combined router notes
+
+Status:
+Scaffolded, not run yet.
+
+The combined router accepts layer, alpha, and threshold arguments. Choose
+these from validation sweeps before running final test routing.
+

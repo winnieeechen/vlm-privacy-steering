@@ -1,0 +1,133 @@
+Method description
+==================
+
+Experiment name
+---------------
+low_rank_discriminant_vectors
+
+Main idea
+---------
+The original vector extraction method uses a plain difference of class means:
+
+positive_mean - negative_mean
+
+This experiment keeps the same positive/negative definitions, but replaces the
+raw mean-difference vector with lower-rank and discriminant variants. The goal is
+to get a steering direction that is less noisy and more aligned with the label
+distinction we care about.
+
+The method is applied to both vector types:
+
+1. condition vectors
+2. behavior vectors
+
+and to both steering directions:
+
+1. over-disclosure steering
+2. under-disclosure steering
+
+
+Difference between PCA and fisher_pca
+-------------------------------------
+PCA is unsupervised.
+
+It only looks at the activation vectors and finds directions with the largest
+variance. It does not know which examples are positive or negative. Therefore,
+PCA directions may capture broad activation variation that is unrelated to the
+privacy behavior we want to steer.
+
+In this experiment, PCA appears in two variants:
+
+pca_projected:
+Project the original mean-difference vector into the top PCA activation
+subspace. This is mainly a denoising step.
+
+pca_residual:
+Remove the top PCA directions from the original mean-difference vector. This is
+useful if the largest-variance directions are nuisance directions rather than
+task-relevant directions.
+
+fisher_pca is supervised.
+
+It first uses PCA to create a stable low-rank activation subspace. Then, inside
+that subspace, it uses the positive/negative labels to compute a regularized
+Fisher/LDA direction. This asks a more targeted question:
+
+Which direction separates positive and negative examples while discounting
+within-class noise?
+
+Because fisher_pca uses the labels, it is usually a better first candidate for
+this steering experiment than plain PCA.
+
+
+Available vector methods
+------------------------
+mean_diff:
+The original baseline. For each layer:
+
+positive_mean - negative_mean
+
+pca_projected:
+Project mean_diff into the top PCA activation subspace, then rescale it to the
+same norm as mean_diff.
+
+pca_residual:
+Remove the top PCA directions from mean_diff, then rescale it to the same norm
+as mean_diff.
+
+fisher_pca:
+Compute a regularized Fisher/LDA direction inside a PCA subspace, align its sign
+with mean_diff, and rescale it to the same norm as mean_diff.
+
+ensemble:
+Take the unit-vector average of mean_diff, pca_projected, and fisher_pca, then
+rescale it to the same norm as mean_diff.
+
+
+Why rescale to the mean_diff norm?
+----------------------------------
+The downstream steering scripts use alpha values that were tuned around the
+scale of the original mean-difference vectors. Rescaling each variant to the
+same norm keeps alpha values roughly comparable across methods.
+
+
+Default method
+--------------
+The default method is:
+
+fisher_pca
+
+Reason:
+It uses the positive/negative labels, but avoids solving a high-dimensional LDA
+problem directly in hidden_size dimensions. This is useful because the number of
+training examples is much smaller than the hidden dimension.
+
+
+Implementation notes
+--------------------
+For every training example, the script runs Qwen2.5-VL and extracts the final
+prompt-token hidden state for each language layer.
+
+The first run saves these activations into a cache file. Later runs can reuse
+the cache and recompute different vector methods without running the model
+again.
+
+The selected method is saved under the same keys expected by existing scripts:
+
+condition_vector
+condition_vector_unit
+behavior_vector
+behavior_vector_unit
+
+Under-disclosure files additionally include compatibility aliases:
+
+utility_condition_vector
+utility_condition_vector_unit
+under_condition_vector
+under_condition_vector_unit
+under_B_behavior_vector
+under_B_behavior_vector_unit
+
+All variants are saved under:
+
+method_vectors
