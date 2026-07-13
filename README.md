@@ -48,3 +48,10 @@ Shared sensitivity axis: the angle bisector between v_ab and v_bc
 
 Left: Project activations onto the plane spanned by v_ab and v_bc. 
 Right: Project activations onto the shared sensitivity axis. 
+
+## Apply behavior vectors under condition
+
+Run `CUDA_VISIBLE_DEVICES=1 python src/conditioned_activation_steering.py --split val --max-rows 30 --alpha-a ${aa} --alpha-c ${ac}`
+tried `aa=ac={0.5, 2.0, 4.0}`
+
+print report only: `python src/conditioned_activation_steering.py --report outputs/conditioned_steering/val/steered_val_layer32_aa2.0_ac2.0.csv`

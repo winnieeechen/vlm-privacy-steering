@@ -1,5 +1,6 @@
 # External reference repositories
 external/
+outputs/tmp_conditioned_steering/val/
 
 # Model/vector checkpoints
 *.pt
