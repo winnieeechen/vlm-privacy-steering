@@ -31,3 +31,20 @@ Model: `Qwen/Qwen2.5-VL-3B-Instruct` (layers=36, hidden=2048)
 
 - Behavior vector 的 mean_diff/ensemble/fisher_pca 全层稳定在 −0.5 附近(A/B/C 答案簇呈等边三角形
 - Condition vector 在 26 层处蓝线(mean_diff)从 0 附近跳到 +0.8 并保持到最后(深层出现共享的"敏感度有序轴")
+
+### Do inputs cluster by true label under the condition vector?
+
+Run `python src/condition_projection.py`
+
+Shared sensitivity axis: the angle bisector between v_ab and v_bc
+| Method | Acc |
+|------------------------------------------------------------|-------|
+| Best accuracy achieved by two-threshold ordinal classifier | 0.603 |
+| Base model pred accuracy | 0.361 |
+
+<p align="center">
+  <img src="outputs/vector_analysis/condition_projection_scatter.png" alt="Condition Projection Scatter" style="width: 80%; height: auto;">
+</p>
+
+Left: Project activations onto the plane spanned by v_ab and v_bc. 
+Right: Project activations onto the shared sensitivity axis. 
