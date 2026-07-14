@@ -482,5 +482,5 @@ Condition vector 判断的是 prompt 是否属于某种 broad condition，而最
 ```
 
 这说明在当前 over direction 上，PC1 比 balanced mean 更能提取共享 transition
-structure。但 10b Under 的失败也说明不能把这个结论推广到所有方向。
+structure。但 10b Under 的失败也说明不能把这个结论推广到所有方向
 
