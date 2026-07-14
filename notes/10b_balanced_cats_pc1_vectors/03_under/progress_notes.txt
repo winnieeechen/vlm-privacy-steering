@@ -1,0 +1,42 @@
+10b under progress
+==================
+
+Selected configuration
+----------------------
+Layer: 28
+Alpha: 0.5
+Selection split: val
+
+Val result
+----------
+Correct / over / under: 85 / 39 / 114
+Correct rate: 35.71%
+
+Selection rule
+--------------
+Alpha 0.5 and alpha 2.0 both reached 85 correct. Alpha 0.5 was selected because
+it has fewer over-disclosure errors: 39 versus 47. It also Pareto-improves the
+base result of 83 correct / 40 over / 115 under, while alpha 2.0 trades a large
+increase in over-disclosure for fewer under errors.
+
+Test status
+-----------
+Completed.
+
+Test result
+-----------
+Unconditional alpha 0.5:
+Correct / over / under: 84 / 47 / 112
+
+Relative to base (87 / 44 / 112), this changes correct by -3, over by +3,
+and under by 0. It fixes 1 wrong sample but harms 4 correct samples.
+
+Conditional result
+------------------
+The val-selected under threshold is -0.04742758.
+
+Conditional test:
+Correct / over / under: 86 / 45 / 112
+
+The gate reduces the unconditional damage but does not beat base and does not
+reduce under-disclosure. Further under alpha tuning is stopped.

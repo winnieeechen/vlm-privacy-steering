@@ -1,0 +1,19 @@
+10b dual conditional progress
+=============================
+
+Selected configuration
+----------------------
+Layer: 28
+Alpha over: 14.0
+Alpha under: 0.5
+Over threshold: -0.07901761
+Under threshold: 0.08586932
+
+Val result
+----------
+Correct / over / under: 116 / 12 / 110
+
+Test result
+-----------
+Correct / over / under: 130 / 13 / 100
+Correct rate: 53.50%

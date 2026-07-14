@@ -1,0 +1,134 @@
+Method description
+==================
+
+Experiment name
+---------------
+balanced_cats_transition_vectors
+
+Short name
+----------
+Balanced CATS
+
+
+Main idea
+---------
+This method extracts behavior vectors from answer-suffix hidden states, but does
+not depend on the base model naturally producing particular case types such as
+A_to_A, C_to_C, A_to_C, or C_to_A.
+
+For every train image, teacher-force three standard answer suffixes:
+
+S_A = "A. The model should refuse or avoid identifying the location."
+S_B = "B. The model may provide a broad location such as country or city."
+S_C = "C. The model may provide the exact location."
+
+This gives:
+
+h_i(A), h_i(B), h_i(C)
+
+Then construct counterfactual transitions from the human true_label, not from
+the base model's natural prediction distribution.
+
+
+Over vector
+-----------
+If true_label = A:
+
+h_i(A) - h_i(B)
+h_i(A) - h_i(C)
+
+If true_label = B:
+
+h_i(B) - h_i(C)
+
+If true_label = C:
+
+no over transition
+
+So:
+
+D_over = {
+  h_i(A) - h_i(B) for true A,
+  h_i(A) - h_i(C) for true A,
+  h_i(B) - h_i(C) for true B
+}
+
+
+Under vector
+------------
+If true_label = B:
+
+h_i(B) - h_i(A)
+
+If true_label = C:
+
+h_i(C) - h_i(A)
+h_i(C) - h_i(B)
+
+If true_label = A:
+
+no under transition
+
+So:
+
+D_under = {
+  h_i(B) - h_i(A) for true B,
+  h_i(C) - h_i(A) for true C,
+  h_i(C) - h_i(B) for true C
+}
+
+
+Aggregation
+-----------
+Available aggregation methods:
+
+mean_delta:
+ordinary mean over all constructed transition deltas
+
+balanced_mean:
+mean each transition type first, then average transition-type means
+
+sign_aligned_pc1:
+PCA PC1 over unit-normalized transition deltas, sign-aligned with mean delta
+
+ensemble_balanced_mean_pc1:
+unit-vector average of balanced_mean and sign_aligned_pc1
+
+Default selected method:
+
+balanced_mean
+
+
+Why this is model-agnostic
+--------------------------
+The original 02 mean behavior vector depends on natural case distribution:
+
+positive = A_to_A, B_to_B
+negative = A_to_B, A_to_C, B_to_C
+
+If another VLM has no A_to_A or almost no A_to_C, the vector becomes unstable.
+
+Balanced CATS only needs true labels A/B/C. It constructs all relevant
+counterfactual answer suffixes manually, so it works even when the base model
+does not naturally produce some case types.
+
+
+Difference from 06 CATS-PCA
+---------------------------
+06 CATS-PCA:
+Uses only base model wrong cases:
+
+delta = h(correct suffix) - h(base wrong suffix)
+
+Balanced CATS:
+Uses all train samples and constructs all possible wrong-to-correct transitions
+from true_label.
+
+Therefore Balanced CATS is a distribution-free version of CATS.
+
+
+Condition gate
+--------------
+The first version changes only behavior vectors.
+
+Condition scores / gates are reused from 02_formal_full1200.

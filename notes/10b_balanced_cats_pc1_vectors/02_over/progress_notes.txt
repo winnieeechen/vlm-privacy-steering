@@ -1,0 +1,26 @@
+10b over progress
+=================
+
+Selected configuration
+----------------------
+Layer: 28
+Alpha: 14.0
+Selection split: val
+
+Val result
+----------
+Correct / over / under: 133 / 14 / 91
+Correct rate: 55.88%
+
+Test result
+-----------
+Correct / over / under: 147 / 14 / 82
+Correct rate: 60.49%
+
+Comparison on test
+------------------
+Base:        87 / 44 / 112
+02 Mean:    104 / 15 / 124
+06 CATS:    108 / 25 / 110
+10 Balanced:100 / 24 / 119
+10b PC1:    147 / 14 / 82

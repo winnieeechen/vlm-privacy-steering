@@ -1,0 +1,14 @@
+10b Balanced CATS-PC1 run instructions
+=======================================
+
+Vectors have already been created from method 10's stored PC1 variants.
+
+First experiment: over unconditional val
+-----------------------------------------
+cd /home/wc221/vlm-privacy-steering
+
+for alpha in 0.5 1.0 1.5 2.0 2.5; do
+  CUDA_VISIBLE_DEVICES=3 python scripts/10b_balanced_cats_pc1_vectors/02_over/02_run_over_behavior_steering.py --split val --layer 28 --alpha "$alpha"
+done
+
+Do not run test until alpha is selected from these val results.

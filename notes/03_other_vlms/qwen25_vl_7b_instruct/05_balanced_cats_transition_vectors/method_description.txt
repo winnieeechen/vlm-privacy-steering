@@ -1,0 +1,19 @@
+Qwen2.5-VL-7B Balanced CATS
+===========================
+
+This applies method 10 to Qwen/Qwen2.5-VL-7B-Instruct.
+
+For every train image, the model is teacher-forced with A, B, and C answer
+suffixes. Over and under transitions are constructed from true_label rather
+than the model's naturally occurring case_type distribution.
+
+The default aggregation is balanced_mean. Over and under extraction share one
+suffix-hidden-state cache. Because the original case-based 7B mean vectors are
+not currently available, vectors are rescaled to the layer norm of the raw
+mean transition delta.
+
+Default evaluation setting:
+
+layer = 32
+alpha = 0.5
+k_answer_tokens = 8

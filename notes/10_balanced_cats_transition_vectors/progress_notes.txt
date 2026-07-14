@@ -1,0 +1,69 @@
+Progress notes
+==============
+
+Setup
+-----
+Created folders under:
+
+scripts/10_balanced_cats_transition_vectors
+outputs/10_balanced_cats_transition_vectors
+notes/10_balanced_cats_transition_vectors
+
+
+Important runtime note
+----------------------
+The extractor needs to teacher-force three answer suffixes for every train
+sample:
+
+717 train samples x 3 suffixes
+
+This is a GPU extraction step. It saves a resumable cache every 25 samples by
+default.
+
+
+Default vector method
+---------------------
+selected_method = balanced_mean
+
+
+Current result
+--------------
+Over extraction and the initial val layer/alpha comparison are complete.
+
+Best Balanced CATS over val:
+
+layer = 28
+alpha = 1.0
+Correct = 87
+Over = 33
+Under = 118
+
+02 mean over val remains better:
+
+Correct = 93
+Over = 22
+Under = 123
+
+See results_summary.txt for the full comparison.
+
+
+Test status
+-----------
+The val-selected over setting (layer 28, alpha 1.0) was evaluated on test.
+
+Correct = 89
+Over = 41
+Under = 113
+
+Compared with test base: +2 correct, -3 over, +1 under.
+Compared with 02 mean test: -5 correct, +11 over, -6 under.
+
+
+Remaining work
+--------------
+Under behavior vector has not been evaluated.
+
+
+Shared cache
+------------
+outputs/10_balanced_cats_transition_vectors/00_cache/all_train_answer_suffix_hidden_states.pt

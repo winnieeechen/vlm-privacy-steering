@@ -1,0 +1,29 @@
+Balanced CATS dual-additive progress notes
+==========================================
+
+Purpose
+-------
+Use Balanced CATS over and under behavior vectors with the original 02
+dual-additive condition gates.
+
+
+Command
+-------
+CUDA_VISIBLE_DEVICES=3 python scripts/10_balanced_cats_transition_vectors/05_dual_additive/03_run_dual_additive_steering.py --split val --layer 28 --alpha-over 2.5 --alpha-under 1.5 --over-threshold -0.03 --under-threshold 0.04
+
+
+Val-selected component settings
+-------------------------------
+
+Over: layer 28, alpha 2.5
+Under: layer 28, alpha 1.5
+
+The initial dual run reuses the original 02 condition gates:
+
+over threshold = -0.03
+under threshold = 0.04
+
+
+Recommended order
+-----------------
+Only run dual after over and under single-vector behavior is understood.

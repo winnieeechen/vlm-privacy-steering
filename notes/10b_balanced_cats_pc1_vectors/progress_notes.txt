@@ -1,0 +1,17 @@
+10b Balanced CATS-PC1 progress
+==============================
+
+Status
+------
+Over unconditional val selection and test evaluation completed.
+
+Best completed result
+---------------------
+Over unconditional, layer 28, alpha 14.0:
+
+val:  133 correct / 14 over / 91 under
+test: 147 correct / 14 over / 82 under
+
+Next
+----
+Tune under unconditional alpha on val only.

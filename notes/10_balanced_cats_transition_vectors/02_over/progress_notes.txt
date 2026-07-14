@@ -1,0 +1,49 @@
+Balanced CATS over progress notes
+=================================
+
+Purpose
+-------
+Construct over behavior vector from all train samples using true_label-based
+counterfactual answer suffix transitions.
+
+
+Commands
+--------
+Extract over vector:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/10_balanced_cats_transition_vectors/02_over/01_extract_over_behavior_vectors.py --selected-method balanced_mean
+
+The extraction is resumable. It writes:
+
+outputs/10_balanced_cats_transition_vectors/00_cache/all_train_answer_suffix_hidden_states.pt
+
+Run val steering after extraction:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/10_balanced_cats_transition_vectors/02_over/02_run_over_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+Run val conditional sweep:
+
+python scripts/10_balanced_cats_transition_vectors/02_over/03_sweep_over_conditional_val.py --layer 32 --alpha 0.5 --threshold-mode quantile --min-gate-rate 0.2 --max-gate-rate 0.8
+
+Current val result (balanced_mean, layer 32, alpha 0.5):
+
+Unconditional: Correct 86, Over 39, Under 113
+Selected conditional threshold: -0.012210076674818993
+Gate: 119/238
+Conditional: Correct 86, Over 39, Under 113
+
+Run test after val selection:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/10_balanced_cats_transition_vectors/02_over/02_run_over_behavior_steering.py --split test --layer 32 --alpha 0.5
+
+Apply selected threshold on test:
+
+python scripts/10_balanced_cats_transition_vectors/02_over/04_apply_over_conditional_test.py --layer 32 --alpha 0.5 --threshold SELECTED_VAL_THRESHOLD
+
+
+Comparison target
+-----------------
+02 mean over conditional val:
+Correct 94/238
+Over 22/238
+Under 122/238

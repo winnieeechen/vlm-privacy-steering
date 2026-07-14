@@ -161,6 +161,7 @@ def main():
     parser.add_argument("--output-csv", required=True)
     parser.add_argument("--layer", type=int, default=32)
     parser.add_argument("--alpha", type=float, default=0.3)
+    parser.add_argument("--vector-method")
     args = parser.parse_args()
 
     base_csv = ROOT / args.base_csv
@@ -172,8 +173,12 @@ def main():
         rows = list(csv.DictReader(f))
 
     payload = torch.load(vector_path, map_location="cpu")
-    vector_key = "behavior_vector" if "behavior_vector" in payload else "under_B_behavior_vector"
-    v = payload[vector_key][args.layer].float()
+    if args.vector_method:
+        vector_key = f"method_vectors.{args.vector_method}"
+        v = payload["method_vectors"][args.vector_method][args.layer].float()
+    else:
+        vector_key = "behavior_vector" if "behavior_vector" in payload else "under_B_behavior_vector"
+        v = payload[vector_key][args.layer].float()
 
     print("Rows:", len(rows))
     print("Base CSV:", base_csv)
@@ -207,6 +212,7 @@ def main():
         rr["under_case_type"] = case
         rr["under_layer"] = args.layer
         rr["under_alpha"] = args.alpha
+        rr["under_vector_method"] = args.vector_method or payload.get("selected_method", "payload_default")
         results.append(rr)
 
         print(

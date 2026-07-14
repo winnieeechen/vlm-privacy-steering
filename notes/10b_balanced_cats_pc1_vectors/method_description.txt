@@ -1,0 +1,37 @@
+Method description
+==================
+
+Experiment name
+---------------
+balanced_cats_pc1_vectors
+
+Short name
+----------
+10b / Balanced CATS-PC1
+
+Definition
+----------
+10b uses exactly the same transition data as method 10:
+
+- all train samples with true_label A/B/C
+- all valid wrong-to-correct counterfactual answer-suffix transitions
+- first 8 teacher-forced answer tokens
+- the same original mean-vector layer norm for rescaling
+
+The only changed component is aggregation:
+
+10:  balanced_mean
+10b: sign_aligned_pc1
+
+For each layer, transition deltas are unit-normalized and mean-centered. The
+first PCA component is sign-aligned with the raw mean transition delta, then
+rescaled to the same reference layer norm used by method 10.
+
+This isolates the effect of balanced mean versus PC1 without changing the
+training samples, suffixes, condition gate, or inference implementation.
+
+Data reuse
+----------
+10b reuses method 10's completed suffix-state cache and its stored
+sign_aligned_pc1 variant. Creating the 10b vector files is CPU-only and does
+not run Qwen again.

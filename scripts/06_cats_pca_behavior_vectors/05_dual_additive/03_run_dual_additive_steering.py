@@ -51,7 +51,8 @@ def main():
         (
             f"outputs/06_cats_pca_behavior_vectors/05_dual_additive/{args.split}/"
             f"dual_additive_cats_pca_{args.split}_layer{args.layer}_"
-            f"alpha{args.alpha_over}_over{args.over_threshold}_under{args.under_threshold}.csv"
+            f"alphaover{args.alpha_over}_alphaunder{args.alpha_under}_"
+            f"overthr{args.over_threshold}_underthr{args.under_threshold}.csv"
         ),
         "--layer",
         str(args.layer),

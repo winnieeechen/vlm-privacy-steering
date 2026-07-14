@@ -1,0 +1,48 @@
+Qwen2.5-VL-7B Balanced CATS run instructions
+=============================================
+
+Run from:
+
+cd /home/wc221/vlm-privacy-steering
+
+Current prerequisite status
+---------------------------
+
+The train base CSV exists.
+The val and test base CSVs must be generated before val/test steering.
+
+
+Step 1: extract over behavior vector (GPU)
+------------------------------------------
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/qwen25_vl_7b_instruct/05_balanced_cats_transition_vectors/02_over/01_extract_over_behavior_vectors.py --selected-method balanced_mean
+
+This performs 717 x 3 teacher-forced forwards and writes a resumable shared
+cache every 25 samples.
+
+
+Step 2: extract under behavior vector (normally CPU cache reuse)
+----------------------------------------------------------------
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/qwen25_vl_7b_instruct/05_balanced_cats_transition_vectors/03_under/01_extract_under_behavior_vectors.py --selected-method balanced_mean
+
+
+Step 3: ensure val base inference exists (GPU)
+----------------------------------------------
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/qwen25_vl_7b_instruct/01_base/01_run_qwen25_vl_7b_base.py --input-csv data/02_full1200/processed_original_logic/geoprivacy_downloaded_val.csv --output-csv outputs/03_other_vlms/qwen25_vl_7b_instruct/00_base/val/base_qwen25_vl_7b_val_238.csv --resume
+
+
+Step 4: run over val steering (GPU)
+-----------------------------------
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/qwen25_vl_7b_instruct/05_balanced_cats_transition_vectors/02_over/02_run_over_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+
+Step 5: run under val steering (GPU)
+------------------------------------
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/qwen25_vl_7b_instruct/05_balanced_cats_transition_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+
+Do not run test until layer and alpha have been selected using val only.

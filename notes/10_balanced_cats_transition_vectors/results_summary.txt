@@ -1,0 +1,114 @@
+Balanced CATS results summary
+=============================
+
+Model: Qwen2.5-VL-3B-Instruct
+Split: val (238 samples)
+Vector aggregation: balanced_mean
+
+
+Results
+-------
+
+method                         correct       over          under
+base                           83 (34.87%)   40 (16.81%)   115 (48.32%)
+Balanced CATS L28 alpha0.5     86 (36.13%)   36 (15.13%)   116 (48.74%)
+Balanced CATS L28 alpha1.0     87 (36.55%)   33 (13.87%)   118 (49.58%)
+Balanced CATS L32 alpha0.5     86 (36.13%)   39 (16.39%)   113 (47.48%)
+Balanced CATS L34 alpha1.0     84 (35.29%)   40 (16.81%)   114 (47.90%)
+02 mean L32 alpha0.5           93 (39.08%)   22 ( 9.24%)   123 (51.68%)
+02 mean conditional            94 (39.50%)   22 ( 9.24%)   122 (51.26%)
+
+L34 alpha0.5 was not generated and is not included.
+
+
+Best Balanced CATS setting
+--------------------------
+
+layer = 28
+alpha = 1.0
+
+Compared with base:
+
+correct: +4
+over:    -7
+under:   +3
+
+Prediction changes:
+
+A_to_B -> A_to_A: 7 corrections
+B_to_B -> B_to_A: 3 regressions
+C_to_B -> C_to_A: 2 changes within under-disclosure
+
+Net correct improvement: +4
+
+
+Conditional result
+------------------
+
+The conditional sweep was run only for layer 32, alpha 0.5.
+
+Unconditional: Correct 86, Over 39, Under 113
+Conditional:   Correct 86, Over 39, Under 113
+
+The reused condition gate did not improve this setting.
+
+
+Comparison with 02 mean
+-----------------------
+
+Best Balanced CATS vs 02 mean unconditional:
+
+correct: 87 vs 93 (-6)
+over:    33 vs 22 (+11)
+under:   118 vs 123 (-5)
+
+Balanced CATS is better than the base model and reduces over-disclosure, but it
+does not outperform the original 02 mean behavior vector on overall correct or
+over-disclosure control.
+
+
+Test result
+-----------
+
+The val-selected setting was fixed before test evaluation:
+
+layer = 28
+alpha = 1.0
+
+method                         correct       over          under
+test base                      87 (35.80%)   44 (18.11%)   112 (46.09%)
+Balanced CATS L28 alpha1.0     89 (36.63%)   41 (16.87%)   113 (46.50%)
+02 mean L32 alpha0.5           94 (38.68%)   30 (12.35%)   119 (48.97%)
+02 mean conditional            95 (39.09%)   30 (12.35%)   118 (48.56%)
+
+Balanced CATS compared with test base:
+
+correct: +2
+over:    -3
+under:   +1
+
+Prediction changes:
+
+A_to_B -> A_to_A: 3 corrections
+B_to_B -> B_to_A: 1 regression
+C_to_B -> C_to_A: 4 changes within under-disclosure
+
+Total changed predictions: 8/243
+Net correct improvement: +2
+
+Balanced CATS compared with 02 mean unconditional test:
+
+correct: 89 vs 94 (-5)
+over:    41 vs 30 (+11)
+under:   113 vs 119 (-6)
+
+
+Conclusion
+----------
+
+Balanced CATS shows a real but limited steering signal. Layer 28 is better than
+layers 32 and 34 for this answer-suffix vector, and alpha 1.0 is better than 0.5
+at layer 28. The test result confirms the val conclusion: the method improves
+over the base model slightly, but remains clearly below 02 mean. It should not
+replace 02 mean as the primary Qwen-3B method. It may still be useful as a
+model-agnostic fallback when another model has missing natural case types.

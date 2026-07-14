@@ -1,0 +1,14 @@
+Progress notes
+==============
+
+Status:
+
+1. 7B Balanced CATS over/under extraction scripts created.
+2. Shared resumable suffix cache configured.
+3. Over/under val and test steering wrappers created.
+4. Train base CSV found: 717 rows.
+5. Val/test base outputs are not present yet.
+
+Next action:
+
+Run Step 1 in run_instructions.txt.

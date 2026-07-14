@@ -184,6 +184,8 @@ def parse_args():
     parser.add_argument("--over-score-csv")
     parser.add_argument("--under-score-csv")
     parser.add_argument("--output-csv")
+    parser.add_argument("--over-vector-method")
+    parser.add_argument("--under-vector-method")
     parser.add_argument("--layer", type=int, default=32)
     parser.add_argument("--alpha-over", type=float, default=0.5)
     parser.add_argument("--alpha-under", type=float, default=0.5)
@@ -210,13 +212,21 @@ def main():
 
     over_payload = torch.load(over_vec_path, map_location="cpu")
     under_payload = torch.load(under_vec_path, map_location="cpu")
-    v_over = over_payload["behavior_vector"][args.layer].float()
-    v_under = under_payload["behavior_vector"][args.layer].float()
+    if args.over_vector_method:
+        v_over = over_payload["method_vectors"][args.over_vector_method][args.layer].float()
+    else:
+        v_over = over_payload["behavior_vector"][args.layer].float()
+    if args.under_vector_method:
+        v_under = under_payload["method_vectors"][args.under_vector_method][args.layer].float()
+    else:
+        v_under = under_payload["behavior_vector"][args.layer].float()
 
     print("Rows:", len(rows))
     print("Base CSV:", base_csv)
     print("Over behavior vector:", over_vec_path)
     print("Under behavior vector:", under_vec_path)
+    print("Over vector method:", args.over_vector_method or over_payload.get("selected_method", "payload default"))
+    print("Under vector method:", args.under_vector_method or under_payload.get("selected_method", "payload default"))
     print("Over score CSV:", over_score_csv)
     print("Under score CSV:", under_score_csv)
     print("Layer:", args.layer)
@@ -269,6 +279,8 @@ def main():
         rr["dual_additive_layer"] = args.layer
         rr["alpha_over"] = args.alpha_over
         rr["alpha_under"] = args.alpha_under
+        rr["over_vector_method"] = args.over_vector_method or over_payload.get("selected_method", "payload_default")
+        rr["under_vector_method"] = args.under_vector_method or under_payload.get("selected_method", "payload_default")
         rr["over_score"] = over_score
         rr["under_score"] = under_score
         rr["over_threshold"] = args.over_threshold

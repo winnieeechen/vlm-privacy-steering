@@ -1,0 +1,52 @@
+Balanced CATS under progress notes
+==================================
+
+Purpose
+-------
+Construct under behavior vector from all train samples using true_label-based
+counterfactual answer suffix transitions.
+
+
+Commands
+--------
+Extract under vector:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/10_balanced_cats_transition_vectors/03_under/01_extract_under_behavior_vectors.py --selected-method balanced_mean
+
+This reuses the shared suffix cache if over extraction has already created it:
+
+outputs/10_balanced_cats_transition_vectors/00_cache/all_train_answer_suffix_hidden_states.pt
+
+Run val steering after extraction:
+
+CUDA_VISIBLE_DEVICES=7 python scripts/10_balanced_cats_transition_vectors/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5
+
+
+Extraction result
+-----------------
+
+Status: complete
+Train samples: 717
+Selected method: balanced_mean
+Total transitions: 710
+
+A_to_B: 144
+A_to_C: 283
+B_to_C: 283
+
+Output:
+
+outputs/10_balanced_cats_transition_vectors/03_under/vectors/under_behavior_vectors_balanced_cats_full1200.pt
+
+
+Val sweep
+---------
+
+Evaluate layers 28, 32, and 34 with alpha 0.5 and 1.0. Select the final
+configuration using val only. Do not run test before val selection.
+
+
+Recommended order
+-----------------
+Run the six val settings, summarize correct/over/under and changed cases, then
+apply only the selected setting to test.
