@@ -1,0 +1,19 @@
+10 Balanced CATS transition vectors
+====================================
+
+Data source:
+    Every Llama training sample with true_label A/B/C, independent of the
+    model's naturally occurring case_type.
+
+For true A, over transitions are B->A and C->A.
+For true B, over transition is C->B and under transition is A->B.
+For true C, under transitions are A->C and B->C.
+
+Each transition is:
+    delta = h(true answer suffix) - h(counterfactual wrong answer suffix)
+
+Transition types are averaged separately and then averaged with equal weight.
+The selected balanced-mean vector is rescaled to the method-02 mean-vector norm.
+
+The payload also stores sign_aligned_pc1 for method 10b. Only behavior vectors
+change; method-02 condition vectors and gates are reused.

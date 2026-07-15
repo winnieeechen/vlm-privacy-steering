@@ -1,0 +1,42 @@
+Llama-3.2-11B-Vision experiment layout
+======================================
+
+The scripts, notes, and outputs trees now use the same method-first layout.
+
+00_base
+    Existing train/val/test base-model predictions.
+
+02_mean_behavior_vectors
+    Existing Llama experiment. Prompt final-token vectors are aggregated with
+    positive_mean - negative_mean. The old 02_over, 03_under, and
+    04_combined_router folders were moved under this method without changing
+    their algorithm or results.
+
+06_cats_pca_behavior_vectors
+    Natural base-model errors only. For each error, compare the teacher-forced
+    correct answer suffix with the naturally predicted wrong suffix, then use
+    sign-aligned PC1.
+
+10_balanced_cats_transition_vectors
+    All train samples. Construct every valid wrong-to-true transition from the
+    true A/B/C label, balance transition types, and aggregate with balanced mean.
+
+10b_balanced_cats_pc1_vectors
+    Uses the same all-sample transitions as method 10, but selects the
+    sign-aligned PC1 stored in method 10's vector payload.
+
+Shared resources
+----------------
+
+outputs/03_other_vlms/llama32_11b_vision/00_shared/cache/
+    One resumable answer-suffix hidden-state cache shared by 06, 10, and 10b.
+
+Condition vectors and condition scores
+--------------------------------------
+
+Methods 06, 10, and 10b only replace behavior-vector extraction. Conditional
+steering reuses method 02 mean condition vectors/scores. This keeps the gate
+fixed while comparing how each behavior direction steers the model.
+
+Do not tune on test. Select layer, alpha, and thresholds on val, then run test
+once with the fixed configuration.

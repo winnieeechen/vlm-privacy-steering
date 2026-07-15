@@ -1,0 +1,308 @@
+Llama-3.2-11B-Vision under-disclosure steering notes
+
+Goal:
+Run the same original-logic under-disclosure steering pipeline used for Qwen2.5-VL-3B on Llama-3.2-11B-Vision.
+
+Model:
+meta-llama/Llama-3.2-11B-Vision-Instruct
+
+Dataset:
+Same original-logic full1200 split.
+
+Train: 717
+Val: 238
+Test: 243
+
+Base outputs:
+Train:
+outputs/03_other_vlms/llama32_11b_vision/00_base/train/base_llama32_vision_train_717.csv
+
+Val:
+outputs/03_other_vlms/llama32_11b_vision/00_base/val/base_llama32_vision_val_238.csv
+
+Test:
+outputs/03_other_vlms/llama32_11b_vision/00_base/test/base_llama32_vision_test_243.csv
+
+Under-disclosure vector logic:
+
+Condition vector:
+positive = true B/C
+negative = true A
+
+Purpose:
+Detect whether the image-question pair is allowed to provide some location information.
+
+Behavior vector:
+positive = B_to_B, C_to_C
+negative = B_to_A, C_to_A, C_to_B
+
+Purpose:
+Move generation away from under-disclosure and toward correct utility-preserving behavior.
+
+============================================================
+Step 1: Build under vector training tables
+============================================================
+
+Script:
+scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/09_build_under_vector_training_tables.py
+
+Status:
+Complete
+
+Under condition vector cases:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vector_cases/under_condition_vector_cases_train_717.csv
+
+Rows:
+717
+
+Condition label counts:
+positive: 427
+negative: 290
+
+Condition true-label counts:
+A: 290
+B: 144
+C: 283
+
+Under behavior vector cases:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vector_cases/under_behavior_vector_cases_train_717.csv
+
+Rows:
+398
+
+Behavior label counts:
+positive: 224
+negative: 174
+
+Behavior case counts:
+B_to_A: 1
+B_to_B: 114
+C_to_B: 173
+C_to_C: 110
+
+Observation:
+The Llama under behavior table is mostly about C_to_B under-disclosure.
+There is only one B_to_A case and no C_to_A cases in train.
+This means the under behavior vector will mainly learn to push C_to_B toward C_to_C, rather than learning a broad refusal-to-utility correction.
+
+============================================================
+Step 2: Extract under condition and behavior vectors
+============================================================
+
+Scripts:
+1. Under condition vector extraction:
+   scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/11_extract_under_condition_vectors.py
+
+2. Under behavior vector extraction:
+   scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/12_extract_under_behavior_vectors.py
+
+Expected outputs:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_condition_vectors_train_717.pt
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_behavior_vectors_train_717.pt
+
+Commands:
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/11_extract_under_condition_vectors.py
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/12_extract_under_behavior_vectors.py
+
+Status:
+Complete
+
+Under condition vector:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_condition_vectors_train_717.pt
+
+Under condition vector metadata:
+num_layers: 40
+hidden_size: 4096
+positive_count: 427
+negative_count: 290
+
+Under behavior vector:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_behavior_vectors_train_717.pt
+
+Under behavior vector metadata:
+num_layers: 40
+hidden_size: 4096
+positive_count: 224
+negative_count: 174
+
+============================================================
+Step 3: Val condition score and under steering setup
+============================================================
+
+Under condition score script:
+scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/13_score_under_condition_signal.py
+
+Under behavior steering script:
+scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/14_run_under_steering.py
+
+Commands:
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/13_score_under_condition_signal.py \
+  --base-csv outputs/03_other_vlms/llama32_11b_vision/00_base/val/base_llama32_vision_val_238.csv \
+  --under-condition-vector outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_condition_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_condition_scores_val_layer32.csv \
+  --layer 32
+
+CUDA_VISIBLE_DEVICES=7 python scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/14_run_under_steering.py \
+  --base-csv outputs/03_other_vlms/llama32_11b_vision/00_base/val/base_llama32_vision_val_238.csv \
+  --under-vector outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/vectors/under_behavior_vectors_train_717.pt \
+  --output-csv outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_steered_llama32_vision_val_layer32_alpha0.5.csv \
+  --layer 32 \
+  --alpha 0.5
+
+Status:
+Complete
+
+Under condition score output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_condition_scores_val_layer32.csv
+
+Under condition score summary by true_label:
+A: n=97, mean=-0.0407, min=-0.1779, max=0.1262
+B: n=47, mean=-0.0023, min=-0.1722, max=0.1135
+C: n=94, mean=0.0560, min=-0.0872, max=0.1857
+
+Suggested threshold:
+-0.0020
+
+Under steering output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_steered_llama32_vision_val_layer32_alpha0.5.csv
+
+Base val:
+Correct: 72/238 = 0.303
+Over-disclosure: 103/238 = 0.433
+Under-disclosure: 63/238 = 0.265
+
+Unconditional under steered val:
+Correct: 86/238 = 0.361
+Over-disclosure: 106/238 = 0.445
+Under-disclosure: 46/238 = 0.193
+
+Change from base:
+Correct: +14
+Over-disclosure: +3
+Under-disclosure: -17
+
+============================================================
+Step 4: Conditional under sweep on val
+============================================================
+
+Script:
+scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/15_sweep_under_conditional_val.py
+
+Output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_conditional_sweep_val_layer32_alpha0.5.csv
+
+Status:
+Complete
+
+Sweep highlights:
+
+Aggressive / best utility setting:
+threshold: -0.08
+gate_true: 215/238
+Correct: 86/238 = 0.361
+Over-disclosure: 106/238 = 0.445
+Under-disclosure: 46/238 = 0.193
+
+Suggested threshold near midpoint:
+threshold: 0.00
+gate_true: 121/238
+Correct: 85/238 = 0.357
+Over-disclosure: 106/238 = 0.445
+Under-disclosure: 47/238 = 0.197
+
+Safer threshold:
+threshold: 0.10
+gate_true: 25/238
+Correct: 79/238 = 0.332
+Over-disclosure: 103/238 = 0.433
+Under-disclosure: 56/238 = 0.235
+
+Observation:
+The under behavior vector is effective at reducing under-disclosure and improving correctness.
+However, most useful thresholds increase over-disclosure by 2-3 cases.
+The safe threshold 0.10 avoids increasing over-disclosure but gives a much smaller under-disclosure improvement.
+
+Interpretation:
+This matches the training table composition.
+The under behavior vector mostly learns to convert C_to_B toward C_to_C.
+That improves utility, but it can also push some A/B cases toward more specific disclosure and raise over-disclosure.
+
+============================================================
+Test unconditional under steering
+============================================================
+
+Under steering output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/test/under_steered_llama32_vision_test_layer32_alpha0.5.csv
+
+Base test:
+Correct: 88/243 = 0.362
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 52/243 = 0.214
+
+Unconditional under steered test:
+Correct: 95/243 = 0.391
+Over-disclosure: 104/243 = 0.428
+Under-disclosure: 44/243 = 0.181
+
+Change from base:
+Correct: +7
+Over-disclosure: +1
+Under-disclosure: -8
+
+Observation:
+The under behavior vector transfers to test better than the over behavior vector.
+It improves correctness and reduces under-disclosure, but still slightly increases over-disclosure.
+
+Final conditional test script:
+scripts/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/16_final_under_conditional_test.py
+
+Selected safe threshold from val:
+0.10
+
+============================================================
+Test condition score and final conditional under steering
+============================================================
+
+Under condition score output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/test/under_condition_scores_test_layer32.csv
+
+Under condition score summary by true_label:
+A: n=98, mean=-0.0311, min=-0.1307, max=0.1270
+B: n=49, mean=-0.0040, min=-0.1156, max=0.1432
+C: n=96, mean=0.0605, min=-0.1169, max=0.2264
+
+Final conditional under output:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/test/final_under_conditional_test_layer32_alpha0.5_thr0.10.csv
+
+Selected setting:
+under behavior layer: 32
+alpha: 0.5
+under condition layer: 32
+threshold: 0.10
+gate_true: 32/243
+
+Base test:
+Correct: 88/243 = 0.362
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 52/243 = 0.214
+
+Unconditional under steered test:
+Correct: 95/243 = 0.391
+Over-disclosure: 104/243 = 0.428
+Under-disclosure: 44/243 = 0.181
+
+Final conditional under test:
+Correct: 91/243 = 0.374
+Over-disclosure: 103/243 = 0.424
+Under-disclosure: 49/243 = 0.202
+
+Change from base, final conditional:
+Correct: +3
+Over-disclosure: 0
+Under-disclosure: -3
+
+Observation:
+The safe conditional under setting transfers to test as intended.
+It improves correctness and reduces under-disclosure without increasing over-disclosure.
+The effect is smaller than unconditional under steering, but it preserves the privacy-safety constraint.

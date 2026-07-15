@@ -1,0 +1,12 @@
+10b Balanced CATS-PC1 vectors
+==============================
+
+This method uses exactly the same all-sample counterfactual transitions and
+shared suffix cache as method 10. It changes only the aggregation:
+
+    method 10  = balanced mean
+    method 10b = sign-aligned PC1 on unit-normalized centered deltas
+
+The PC1 sign is aligned with the raw mean transition and its layer norm is
+rescaled to the method-02 mean-vector norm. The 10b selection step is CPU-only
+and reads method 10's saved method_vectors; it does not rerun the 11B model.

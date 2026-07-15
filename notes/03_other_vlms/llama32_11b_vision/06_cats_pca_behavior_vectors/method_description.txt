@@ -1,0 +1,14 @@
+06 CATS-PCA behavior vectors
+============================
+
+Data source:
+    Natural over/under errors in the Llama train predictions.
+
+For each natural error:
+    delta = h(true answer suffix) - h(base-predicted wrong answer suffix)
+
+Each h is the mean hidden state over the first K=8 teacher-forced answer
+tokens. Per layer, deltas are unit-normalized and centered; sign-aligned PC1 is
+selected and rescaled to the corresponding method-02 mean-vector norm.
+
+Only behavior vectors change. Method-02 condition vectors and gates are reused.

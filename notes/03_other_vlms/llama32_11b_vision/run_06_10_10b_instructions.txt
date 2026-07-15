@@ -1,0 +1,109 @@
+Run 06 / 10 / 10b on Llama-3.2-11B-Vision
+==========================================
+
+Working directory
+-----------------
+
+cd /home/wc221/vlm-privacy-steering
+
+
+0. Existing method 02
+---------------------
+
+The existing mean vectors/results are now under:
+
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/
+
+They do not need to be extracted again.
+
+
+1. Extract method 10 first (recommended)
+----------------------------------------
+
+The first command creates the shared suffix cache. It is the slow GPU step and
+is resumable; rerun the same command if interrupted.
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/10_balanced_cats_transition_vectors/02_over/01_extract_over_behavior_vectors.py
+
+The second command reuses the cache:
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/10_balanced_cats_transition_vectors/03_under/01_extract_under_behavior_vectors.py
+
+
+2. Select method 10b vectors (CPU only)
+---------------------------------------
+
+python scripts/03_other_vlms/llama32_11b_vision/10b_balanced_cats_pc1_vectors/02_over/01_select_over_pc1_vector.py
+
+python scripts/03_other_vlms/llama32_11b_vision/10b_balanced_cats_pc1_vectors/03_under/01_select_under_pc1_vector.py
+
+
+3. Extract method 06
+--------------------
+
+These commands reuse the same suffix cache and select only natural base errors.
+PCA aggregation is CPU-heavy, but the 11B forward pass is not repeated.
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/06_cats_pca_behavior_vectors/02_over/01_extract_over_behavior_vectors.py
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/06_cats_pca_behavior_vectors/03_under/01_extract_under_behavior_vectors.py
+
+
+4. Unconditional val sweep
+--------------------------
+
+Replace METHOD with one of:
+    06_cats_pca_behavior_vectors
+    10_balanced_cats_transition_vectors
+    10b_balanced_cats_pc1_vectors
+
+Over example:
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/METHOD/02_over/02_run_over_behavior_steering.py --split val --layer 24 --alpha 1.0 --resume
+
+Under example:
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/METHOD/03_under/02_run_under_behavior_steering.py --split val --layer 32 --alpha 0.5 --resume
+
+Start with Llama's previously useful layers 24 and 32. On val, compare a small
+grid such as layers 24/28/32/36 and alpha 0.5/1.0/1.5/2.0. Different vector
+normalization can make the best alpha method-specific.
+
+
+5. Conditional over/under on cached val outputs
+------------------------------------------------
+
+Condition scores remain under method 02 and can be reused when the condition
+layer is unchanged. Use the repository common cached sweep scripts with:
+
+over score:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/02_over/val/condition_scores_val_layer32.csv
+
+under score:
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/03_under/val/under_condition_scores_val_layer32.csv
+
+For over, pass score-key=condition_score and
+steered-case-key=steered_case_type to:
+scripts/00_common/sweep_conditional_threshold_cached.py
+
+For under, pass score-key=under_condition_score and
+steered-case-key=under_case_type. Save each sweep CSV inside the corresponding
+METHOD/02_over/val or METHOD/03_under/val output directory.
+
+
+6. Dual conditional val
+-----------------------
+
+After selecting over/under alpha and thresholds on val:
+
+CUDA_VISIBLE_DEVICES=3 python scripts/03_other_vlms/llama32_11b_vision/METHOD/05_dual_additive/03_run_dual_additive_steering.py --split val --over-layer 24 --under-layer 32 --alpha-over 1.0 --alpha-under 0.5 --conditional --over-threshold OVER_THR --under-threshold UNDER_THR --resume
+
+
+7. Fixed test
+-------------
+
+Run test only after val selection. Change --split val to --split test and keep
+the selected layers, alphas, and thresholds unchanged. Run the over and under
+unconditional test CSVs first; conditional over/under can then be produced with
+scripts/00_common/apply_conditional_threshold_cached.py without another model
+forward. Run dual conditional test with the method's dual wrapper.

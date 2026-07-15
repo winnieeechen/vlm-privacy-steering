@@ -33,7 +33,7 @@ Image directory:
 data/02_full1200/images/
 
 Script:
-scripts/03_other_vlms/llama32_11b_vision/01_base/01_run_llama32_vision_base.py
+scripts/03_other_vlms/llama32_11b_vision/00_base/01_run_llama32_vision_base.py
 
 Output directory:
 outputs/03_other_vlms/llama32_11b_vision/00_base/
@@ -202,8 +202,8 @@ Train, val, and test base inference are complete.
 The over-disclosure vector training tables have also been built from the train base outputs.
 
 Vector case files:
-outputs/03_other_vlms/llama32_11b_vision/02_over/vector_cases/condition_vector_cases_train_717.csv
-outputs/03_other_vlms/llama32_11b_vision/02_over/vector_cases/behavior_vector_cases_train_717.csv
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/02_over/vector_cases/condition_vector_cases_train_717.csv
+outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/02_over/vector_cases/behavior_vector_cases_train_717.csv
 
 Next over-disclosure steps:
 1. Extract condition vector: true A/B vs true C.
