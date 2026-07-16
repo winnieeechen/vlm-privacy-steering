@@ -1,0 +1,4 @@
+method,setting,n,correct,correct_pct,over,over_pct,under,under_pct,path
+Base,No steering,243,88,36.21399176954733,103,42.38683127572016,52,21.39917695473251,outputs/03_other_vlms/llama32_11b_vision/00_base/test/base_llama32_vision_test_243.csv
+Mean Combined,"Conditional | over L24, under L32",243,92,37.86008230452675,102,41.97530864197531,49,20.16460905349794,outputs/03_other_vlms/llama32_11b_vision/02_mean_behavior_vectors/04_combined_router/test/combined_test_over_first_over24_under32.csv
+Pairwise Router,"L28 | alpha_A=1.5, alpha_C=1.0",243,156,64.19753086419753,40,16.46090534979424,47,19.34156378600823,outputs/03_other_vlms/llama32_11b_vision/11_pairwise_boundary_router/router/test/routed_llama32_vision_test_layer28_aa1.5_ac1.0_bisector.csv

@@ -28,38 +28,33 @@ FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 PANELS = {
     "Over unconditional": [
         ("Base", "no steering", "outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv", "case_type"),
-        ("02 Mean", "a=1.0", "outputs/02_formal_full1200/02_over/test/steered_mean_qwen_vl_test_layer28_alpha1.0.csv", "steered_case_type"),
-        ("06 CATS-PCA", "a=2.0", "outputs/06_cats_pca_behavior_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.0.csv", "steered_case_type"),
-        ("10 Balanced", "a=2.5", "outputs/10_balanced_cats_transition_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.5.csv", "steered_case_type"),
-        ("10b PC1", "a=14.0", "outputs/10b_balanced_cats_pc1_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha14.0.csv", "steered_case_type"),
+        ("Mean", "a=1.0", "outputs/02_formal_full1200/02_over/test/steered_mean_qwen_vl_test_layer28_alpha1.0.csv", "steered_case_type"),
+        ("CATS-PCA", "a=2.0", "outputs/06_cats_pca_behavior_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.0.csv", "steered_case_type"),
+        ("PC1", "a=14.0", "outputs/10b_balanced_cats_pc1_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha14.0.csv", "steered_case_type"),
     ],
     "Over conditional": [
         ("Base", "no steering", "outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv", "case_type"),
-        ("02 Mean", "a=1.0\nthr=0.011", "outputs/02_formal_full1200/02_over/test/conditional_mean_qwen_vl_test_layer28_alpha1.0_thr0.01074012.csv", "conditional_case_type"),
-        ("06 CATS-PCA", "a=2.0\nthr=-0.079", "outputs/06_cats_pca_behavior_vectors/02_over/test/conditional_cats_pca_qwen_vl_test_layer28_alpha2.0_thr-0.07901761.csv", "conditional_case_type"),
-        ("10 Balanced", "a=2.5\nthr=-0.012", "outputs/10_balanced_cats_transition_vectors/02_over/test/conditional_balanced_cats_qwen_vl_test_layer28_alpha2.5_thr-0.01161985.csv", "conditional_case_type"),
-        ("10b PC1", "a=14.0\nthr=-0.079", "outputs/10b_balanced_cats_pc1_vectors/02_over/test/conditional_over_pc1_test_layer28_alpha14.0_thr-0.07901761.csv", "conditional_case_type"),
+        ("Mean", "a=1.0\nthr=0.011", "outputs/02_formal_full1200/02_over/test/conditional_mean_qwen_vl_test_layer28_alpha1.0_thr0.01074012.csv", "conditional_case_type"),
+        ("CATS-PCA", "a=2.0\nthr=-0.079", "outputs/06_cats_pca_behavior_vectors/02_over/test/conditional_cats_pca_qwen_vl_test_layer28_alpha2.0_thr-0.07901761.csv", "conditional_case_type"),
+        ("PC1", "a=14.0\nthr=-0.079", "outputs/10b_balanced_cats_pc1_vectors/02_over/test/conditional_over_pc1_test_layer28_alpha14.0_thr-0.07901761.csv", "conditional_case_type"),
     ],
     "Under unconditional": [
         ("Base", "no steering", "outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv", "case_type"),
-        ("02 Mean", "a=1.0", "outputs/02_formal_full1200/03_under/test/steered_under_mean_qwen_vl_test_layer28_alpha1.0.csv", "under_case_type"),
-        ("06 CATS-PCA", "a=1.0", "outputs/06_cats_pca_behavior_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.0.csv", "under_case_type"),
-        ("10 Balanced", "a=1.5", "outputs/10_balanced_cats_transition_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.5.csv", "under_case_type"),
-        ("10b PC1", "a=0.5", "outputs/10b_balanced_cats_pc1_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha0.5.csv", "under_case_type"),
+        ("Mean", "a=1.0", "outputs/02_formal_full1200/03_under/test/steered_under_mean_qwen_vl_test_layer28_alpha1.0.csv", "under_case_type"),
+        ("CATS-PCA", "a=1.0", "outputs/06_cats_pca_behavior_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.0.csv", "under_case_type"),
+        ("PC1", "a=0.5", "outputs/10b_balanced_cats_pc1_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha0.5.csv", "under_case_type"),
     ],
     "Under conditional": [
         ("Base", "no steering", "outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv", "case_type"),
-        ("02 Mean", "a=1.0\nthr=-0.047", "outputs/02_formal_full1200/03_under/test/conditional_under_mean_qwen_vl_test_layer28_alpha1.0_thr-0.04742758.csv", "conditional_case_type"),
-        ("06 CATS-PCA", "a=1.0\nthr=-0.064", "outputs/06_cats_pca_behavior_vectors/03_under/test/conditional_under_cats_pca_qwen_vl_test_layer28_alpha1.0_thr-0.06363814.csv", "conditional_case_type"),
-        ("10 Balanced", "a=1.5\nthr=-0.064", "outputs/10_balanced_cats_transition_vectors/03_under/test/conditional_under_balanced_cats_qwen_vl_test_layer28_alpha1.5_thr-0.06363814.csv", "conditional_case_type"),
-        ("10b PC1", "a=0.5\nthr=-0.047", "outputs/10b_balanced_cats_pc1_vectors/03_under/test/conditional_under_pc1_test_layer28_alpha0.5_thr-0.04742758.csv", "conditional_case_type"),
+        ("Mean", "a=1.0\nthr=-0.047", "outputs/02_formal_full1200/03_under/test/conditional_under_mean_qwen_vl_test_layer28_alpha1.0_thr-0.04742758.csv", "conditional_case_type"),
+        ("CATS-PCA", "a=1.0\nthr=-0.064", "outputs/06_cats_pca_behavior_vectors/03_under/test/conditional_under_cats_pca_qwen_vl_test_layer28_alpha1.0_thr-0.06363814.csv", "conditional_case_type"),
+        ("PC1", "a=0.5\nthr=-0.047", "outputs/10b_balanced_cats_pc1_vectors/03_under/test/conditional_under_pc1_test_layer28_alpha0.5_thr-0.04742758.csv", "conditional_case_type"),
     ],
     "Dual conditional": [
         ("Base", "no steering", "outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv", "case_type"),
-        ("02 Mean", "o=1.0, u=1.0\nthr=0.011/0.086", "outputs/02_formal_full1200/05_dual_additive/optimized_layer28/test/dual_conditional_mean_test_layer28_over1.0_under1.0_overthr0.01074012_underthr0.08586932.csv", "dual_additive_case_type"),
-        ("06 CATS-PCA", "o=2.0, u=1.0\nthr=-0.079/0.086", "outputs/06_cats_pca_behavior_vectors/05_dual_additive/test/dual_conditional_cats_pca_test_layer28_over2.0_under1.0_overthr-0.07901761_underthr0.08586932.csv", "dual_additive_case_type"),
-        ("10 Balanced", "o=2.5, u=1.5\nthr=0.032/-0.021", "outputs/10_balanced_cats_transition_vectors/05_dual_additive/test/dual_conditional_balanced_cats_test_layer28_over2.5_under1.5_overthr0.03188088_underthr-0.02138572.csv", "dual_additive_case_type"),
-        ("10b PC1", "o=14.0, u=0.5\nthr=-0.079/0.086", "outputs/10b_balanced_cats_pc1_vectors/05_dual_additive/test/dual_conditional_balanced_cats_pc1_test_layer28_over14.0_under0.5_overthr-0.07901761_underthr0.08586932.csv", "dual_additive_case_type"),
+        ("Mean", "o=1.0, u=1.0\nthr=0.011/0.086", "outputs/02_formal_full1200/05_dual_additive/optimized_layer28/test/dual_conditional_mean_test_layer28_over1.0_under1.0_overthr0.01074012_underthr0.08586932.csv", "dual_additive_case_type"),
+        ("CATS-PCA", "o=2.0, u=1.0\nthr=-0.079/0.086", "outputs/06_cats_pca_behavior_vectors/05_dual_additive/test/dual_conditional_cats_pca_test_layer28_over2.0_under1.0_overthr-0.07901761_underthr0.08586932.csv", "dual_additive_case_type"),
+        ("PC1", "o=14.0, u=0.5\nthr=-0.079/0.086", "outputs/10b_balanced_cats_pc1_vectors/05_dual_additive/test/dual_conditional_balanced_cats_pc1_test_layer28_over14.0_under0.5_overthr-0.07901761_underthr0.08586932.csv", "dual_additive_case_type"),
     ],
 }
 
@@ -133,7 +128,7 @@ def write_csv(records, output):
 
 
 def draw_chart(records, output):
-    width, height = 3900, 1700
+    width, height = 3000, 1700
     image = Image.new("RGB", (width, height), "#ffffff")
     draw = ImageDraw.Draw(image)
 
@@ -177,8 +172,8 @@ def draw_chart(records, output):
         ]
         return max(20, math.ceil((max(values) + 18) / 20) * 20)
 
-    panel_margin = 38
-    panel_gap = 24
+    panel_margin = 30
+    panel_gap = 16
     panel_width = (
         width - 2 * panel_margin - (len(PANELS) - 1) * panel_gap
     ) / len(PANELS)
@@ -263,7 +258,6 @@ def draw_chart(records, output):
             axis_max(error_metrics),
         )
 
-    centered_text(draw, (width / 2, 1580), "Base/no steering: Correct 87 (35.8%), Over 44 (18.1%), Under 112 (46.1%). Alpha and threshold values were selected on validation data; this figure uses test data only.", subtitle_font, muted)
     output.parent.mkdir(parents=True, exist_ok=True)
     image.save(output, format="PNG", optimize=True)
 

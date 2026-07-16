@@ -1,38 +1,30 @@
 panel,method,setting,available,n,correct,correct_pct,over,over_pct,under,under_pct,path
 Over unconditional,Base,no steering,True,243,87,35.80,44,18.11,112,46.09,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
-Over unconditional,02 Mean,a=1.0,True,243,104,42.80,15,6.17,124,51.03,outputs/02_formal_full1200/02_over/test/steered_mean_qwen_vl_test_layer28_alpha1.0.csv
-Over unconditional,06 CATS-PCA,a=2.0,True,243,108,44.44,25,10.29,110,45.27,outputs/06_cats_pca_behavior_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.0.csv
-Over unconditional,10 Balanced,a=2.5,True,243,100,41.15,24,9.88,119,48.97,outputs/10_balanced_cats_transition_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.5.csv
-Over unconditional,10b PC1,a=14.0,True,243,147,60.49,14,5.76,82,33.74,outputs/10b_balanced_cats_pc1_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha14.0.csv
+Over unconditional,Mean,a=1.0,True,243,104,42.80,15,6.17,124,51.03,outputs/02_formal_full1200/02_over/test/steered_mean_qwen_vl_test_layer28_alpha1.0.csv
+Over unconditional,CATS-PCA,a=2.0,True,243,108,44.44,25,10.29,110,45.27,outputs/06_cats_pca_behavior_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.0.csv
+Over unconditional,PC1,a=14.0,True,243,147,60.49,14,5.76,82,33.74,outputs/10b_balanced_cats_pc1_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha14.0.csv
 Over conditional,Base,no steering,True,243,87,35.80,44,18.11,112,46.09,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
-Over conditional,02 Mean,"a=1.0
+Over conditional,Mean,"a=1.0
 thr=0.011",True,243,101,41.56,22,9.05,120,49.38,outputs/02_formal_full1200/02_over/test/conditional_mean_qwen_vl_test_layer28_alpha1.0_thr0.01074012.csv
-Over conditional,06 CATS-PCA,"a=2.0
+Over conditional,CATS-PCA,"a=2.0
 thr=-0.079",True,243,102,41.98,24,9.88,117,48.15,outputs/06_cats_pca_behavior_vectors/02_over/test/conditional_cats_pca_qwen_vl_test_layer28_alpha2.0_thr-0.07901761.csv
-Over conditional,10 Balanced,"a=2.5
-thr=-0.012",True,243,100,41.15,25,10.29,118,48.56,outputs/10_balanced_cats_transition_vectors/02_over/test/conditional_balanced_cats_qwen_vl_test_layer28_alpha2.5_thr-0.01161985.csv
-Over conditional,10b PC1,"a=14.0
+Over conditional,PC1,"a=14.0
 thr=-0.079",True,243,131,53.91,13,5.35,99,40.74,outputs/10b_balanced_cats_pc1_vectors/02_over/test/conditional_over_pc1_test_layer28_alpha14.0_thr-0.07901761.csv
 Under unconditional,Base,no steering,True,243,87,35.80,44,18.11,112,46.09,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
-Under unconditional,02 Mean,a=1.0,True,243,77,31.69,57,23.46,109,44.86,outputs/02_formal_full1200/03_under/test/steered_under_mean_qwen_vl_test_layer28_alpha1.0.csv
-Under unconditional,06 CATS-PCA,a=1.0,True,243,92,37.86,41,16.87,110,45.27,outputs/06_cats_pca_behavior_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.0.csv
-Under unconditional,10 Balanced,a=1.5,True,243,88,36.21,47,19.34,108,44.44,outputs/10_balanced_cats_transition_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.5.csv
-Under unconditional,10b PC1,a=0.5,True,243,84,34.57,47,19.34,112,46.09,outputs/10b_balanced_cats_pc1_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha0.5.csv
+Under unconditional,Mean,a=1.0,True,243,77,31.69,57,23.46,109,44.86,outputs/02_formal_full1200/03_under/test/steered_under_mean_qwen_vl_test_layer28_alpha1.0.csv
+Under unconditional,CATS-PCA,a=1.0,True,243,92,37.86,41,16.87,110,45.27,outputs/06_cats_pca_behavior_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha1.0.csv
+Under unconditional,PC1,a=0.5,True,243,84,34.57,47,19.34,112,46.09,outputs/10b_balanced_cats_pc1_vectors/03_under/test/steered_under_qwen_vl_test_layer28_alpha0.5.csv
 Under conditional,Base,no steering,True,243,87,35.80,44,18.11,112,46.09,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
-Under conditional,02 Mean,"a=1.0
+Under conditional,Mean,"a=1.0
 thr=-0.047",True,243,81,33.33,52,21.40,110,45.27,outputs/02_formal_full1200/03_under/test/conditional_under_mean_qwen_vl_test_layer28_alpha1.0_thr-0.04742758.csv
-Under conditional,06 CATS-PCA,"a=1.0
+Under conditional,CATS-PCA,"a=1.0
 thr=-0.064",True,243,92,37.86,41,16.87,110,45.27,outputs/06_cats_pca_behavior_vectors/03_under/test/conditional_under_cats_pca_qwen_vl_test_layer28_alpha1.0_thr-0.06363814.csv
-Under conditional,10 Balanced,"a=1.5
-thr=-0.064",True,243,88,36.21,47,19.34,108,44.44,outputs/10_balanced_cats_transition_vectors/03_under/test/conditional_under_balanced_cats_qwen_vl_test_layer28_alpha1.5_thr-0.06363814.csv
-Under conditional,10b PC1,"a=0.5
+Under conditional,PC1,"a=0.5
 thr=-0.047",True,243,86,35.39,45,18.52,112,46.09,outputs/10b_balanced_cats_pc1_vectors/03_under/test/conditional_under_pc1_test_layer28_alpha0.5_thr-0.04742758.csv
 Dual conditional,Base,no steering,True,243,87,35.80,44,18.11,112,46.09,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
-Dual conditional,02 Mean,"o=1.0, u=1.0
+Dual conditional,Mean,"o=1.0, u=1.0
 thr=0.011/0.086",True,243,101,41.56,22,9.05,120,49.38,outputs/02_formal_full1200/05_dual_additive/optimized_layer28/test/dual_conditional_mean_test_layer28_over1.0_under1.0_overthr0.01074012_underthr0.08586932.csv
-Dual conditional,06 CATS-PCA,"o=2.0, u=1.0
+Dual conditional,CATS-PCA,"o=2.0, u=1.0
 thr=-0.079/0.086",True,243,105,43.21,24,9.88,114,46.91,outputs/06_cats_pca_behavior_vectors/05_dual_additive/test/dual_conditional_cats_pca_test_layer28_over2.0_under1.0_overthr-0.07901761_underthr0.08586932.csv
-Dual conditional,10 Balanced,"o=2.5, u=1.5
-thr=0.032/-0.021",True,243,98,40.33,35,14.40,110,45.27,outputs/10_balanced_cats_transition_vectors/05_dual_additive/test/dual_conditional_balanced_cats_test_layer28_over2.5_under1.5_overthr0.03188088_underthr-0.02138572.csv
-Dual conditional,10b PC1,"o=14.0, u=0.5
+Dual conditional,PC1,"o=14.0, u=0.5
 thr=-0.079/0.086",True,243,130,53.50,13,5.35,100,41.15,outputs/10b_balanced_cats_pc1_vectors/05_dual_additive/test/dual_conditional_balanced_cats_pc1_test_layer28_over14.0_under0.5_overthr-0.07901761_underthr0.08586932.csv

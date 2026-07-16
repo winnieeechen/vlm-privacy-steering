@@ -1,0 +1,6 @@
+method,setting,n,correct,correct_pct,over,over_pct,under,under_pct,path
+Base,No steering,243,87,35.80246913580247,44,18.106995884773664,112,46.09053497942387,outputs/02_formal_full1200/00_base/test/base_qwen_vl_test_243.csv
+Mean Diff,"Over uncond. | L28, alpha=1.0",243,104,42.79835390946502,15,6.172839506172839,124,51.02880658436214,outputs/02_formal_full1200/02_over/test/steered_mean_qwen_vl_test_layer28_alpha1.0.csv
+CATS-PCA,"Over uncond. | L28, alpha=2.0",243,108,44.44444444444444,25,10.2880658436214,110,45.267489711934154,outputs/06_cats_pca_behavior_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha2.0.csv
+Balanced CATS-PC1,"Over uncond. | L28, alpha=14.0",243,147,60.49382716049383,14,5.761316872427984,82,33.74485596707819,outputs/10b_balanced_cats_pc1_vectors/02_over/test/steered_qwen_vl_test_layer28_alpha14.0.csv
+Pairwise Router,"L28 | alpha_A=1.5, alpha_C=1.5",243,153,62.96296296296296,45,18.51851851851852,45,18.51851851851852,outputs/11_pairwise_boundary_vectors/04_pairwise_router/test/routed_test_layer28_aa1.5_ac1.5_bisector.csv

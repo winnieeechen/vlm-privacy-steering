@@ -206,13 +206,36 @@ def save_transition_figures(records, output_dir, dpi):
     plt.close(fig)
 
     matrix9 = true_base_matrix(records)
-    row_labels = [f"{true_label}->{base_pred}" for true_label in LABELS for base_pred in LABELS]
-    fig, ax = plt.subplots(figsize=(7, 10), constrained_layout=True)
-    annotate_matrix(
-        ax, matrix9, row_labels, [f"steered {label}" for label in LABELS],
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.2), constrained_layout=True)
+    vmax = max(1, int(matrix9.max()))
+    cutoff = vmax * 0.55
+    image = None
+    for true_index, (true_label, ax) in enumerate(zip(LABELS, axes)):
+        panel = matrix9[3 * true_index:3 * (true_index + 1)]
+        image = ax.imshow(panel, cmap="Purples", vmin=0, vmax=vmax)
+        for base_index in range(3):
+            for steered_index in range(3):
+                value = panel[base_index, steered_index]
+                ax.text(
+                    steered_index,
+                    base_index,
+                    str(value),
+                    ha="center",
+                    va="center",
+                    weight="bold",
+                    color="white" if value > cutoff else "#111111",
+                )
+        ax.set_xticks(range(3), LABELS)
+        ax.set_yticks(range(3), LABELS)
+        ax.set_title(f"True label: {true_label}", weight="bold")
+
+    axes[0].set_ylabel("Base prediction")
+    axes[1].set_xlabel("10b unconditional steered prediction")
+    fig.suptitle(
         "True label -> base prediction -> steered prediction",
-        cmap="Purples",
+        weight="bold",
     )
+    fig.colorbar(image, ax=axes, fraction=0.025, pad=0.025, label="Test samples")
     fig.savefig(output_dir / "true_base_to_steered_matrix.png", dpi=dpi)
     plt.close(fig)
 
