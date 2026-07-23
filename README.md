@@ -36,7 +36,7 @@ $$
 state 做 centering 和 L2 normalization：
 
 $$
-r_i=\operatorname{unit}(c_i-\mu_{\mathrm{route}}).
+r_i=\mathrm{unit}(c_i-\mu_{\mathrm{route}}).
 $$
 
 Condition Memory 保存：
@@ -85,7 +85,7 @@ $$
 training 阶段相同的 center 做 normalization：
 
 $$
-r(x)=\operatorname{unit}(c(x)-\mu_{\mathrm{route}}).
+r(x)=\mathrm{unit}(c(x)-\mu_{\mathrm{route}}).
 $$
 
 计算 $r(x)$ 与 Condition Memory 中所有 $r_i$ 的 cosine similarity，取 top-$k$
@@ -122,9 +122,9 @@ representation $a_i$。使用 temperature $\tau=0.05$ 的 softmax weights 计算
 similarity-weighted local centroid：
 
 $$
-w_i^y(x)=\frac{\exp(\operatorname{sim}(r(x),r_i)/\tau)}
+w_i^y(x)=\frac{\exp(\mathrm{sim}(r(x),r_i)/\tau)}
 {\sum_{j\in\mathcal N_m^y(x)}
-\exp(\operatorname{sim}(r(x),r_j)/\tau)},
+\exp(\mathrm{sim}(r(x),r_j)/\tau)},
 \qquad
 \mu_y^{\mathrm{local}}(x)=\sum_{i\in\mathcal N_m^y(x)}w_i^y(x)a_i.
 $$
@@ -198,7 +198,7 @@ contribution 会自动减小。
 confidence 自适应变化。对于 $y\in\{A,C\}$：
 
 $$
-s_y(x)=\operatorname{clip}\left(
+s_y(x)=\mathrm{clip}\left(
 \frac{q(x)-\theta_y}{1-\theta_y},0,1\right),\qquad
 \alpha_y(x)=\alpha_y^{\min}+s_y(x)
 (\alpha_y^{\max}-\alpha_y^{\min}).
