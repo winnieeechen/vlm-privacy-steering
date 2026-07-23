@@ -43,7 +43,7 @@ def export_csv(source, destination):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output-dir", default="results/14_free")
+    parser.add_argument("--output-dir", default="outputs/14_free")
     return parser.parse_args()
 
 

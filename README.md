@@ -258,9 +258,9 @@ accuracy by `17.3` percentage points over the stored free-form base responses.
 
 Complete per-example artifacts:
 
-- [Validation results](results/14_free/val_results.csv)
-- [Test results](results/14_free/test_results.csv)
-- [Validation confidence sweep](results/14_free/validation_confidence_sweep.csv)
+- [Validation results](outputs/14_free/val_results.csv)
+- [Test results](outputs/14_free/test_results.csv)
+- [Validation confidence sweep](outputs/14_free/validation_confidence_sweep.csv)
 
 ### Confidence-gate ablation
 
